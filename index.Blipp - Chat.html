@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blipp - Chat com Contatos</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+      if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark')
+      } else {
+        document.documentElement.classList.remove('dark')
+      }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #888; border-radius: 3px; }
+        .dark ::-webkit-scrollbar-track { background: #2d3748; }
+        .dark ::-webkit-scrollbar-thumb { background: #718096; }
+        .hidden { display: none; }
+        .chat-bg {
+            background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+        }
+        .dark .chat-bg {
+            background-image: linear-gradient(rgba(17, 24, 39, 0.8), rgba(17, 24, 39, 0.8)), url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+        }
+        /* Estilos para o toggle switch */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #4A90E2;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #4A90E2;
+        }
+        .pulse-ring {
+            box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(59, 130, 246, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900">
+
+    <!-- Tela de Autenticação -->
+    <div id="auth-container" class="w-full h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
+            <h1 class="text-3xl font-bold text-center text-blue-600 dark:text-blue-500 mb-2">Blipp</h1>
+            <p class="text-center text-gray-600 dark:text-gray-300 mb-8">Seu novo app de chat.</p>
+            <div id="auth-forms">
+                <form id="login-form" class="">
+                    <input type="email" id="login-email" placeholder="E-mail" required class="w-full mb-4 p-3 border rounded-md bg-gray-50 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input type="password" id="login-password" placeholder="Senha" required class="w-full mb-4 p-3 border rounded-md bg-gray-50 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button type="submit" class="w-full bg-blue-600 text-white p-3 rounded-md font-semibold hover:bg-blue-700 transition-colors">Entrar</button>
+                    <p class="text-center text-sm text-gray-500 mt-4">Não tem uma conta? <a href="#" id="show-signup" class="text-blue-500 hover:underline">Cadastre-se</a></p>
+                </form>
+                <form id="signup-form" class="hidden">
+                    <input type="email" id="signup-email" placeholder="E-mail" required class="w-full mb-4 p-3 border rounded-md bg-gray-50 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input type="password" id="signup-password" placeholder="Senha (mínimo 6 caracteres)" required class="w-full mb-4 p-3 border rounded-md bg-gray-50 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button type="submit" class="w-full bg-green-600 text-white p-3 rounded-md font-semibold hover:bg-green-700 transition-colors">Criar Conta</button>
+                     <p class="text-center text-sm text-gray-500 mt-4">Já tem uma conta? <a href="#" id="show-login" class="text-blue-500 hover:underline">Faça login</a></p>
+                </form>
+            </div>
+            <div class="my-6 flex items-center">
+                <hr class="flex-grow border-gray-300 dark:border-gray-600"><span class="mx-4 text-gray-500">OU</span><hr class="flex-grow border-gray-300 dark:border-gray-600">
+            </div>
+            <button id="google-login-btn" class="w-full flex items-center justify-center bg-white border border-gray-300 dark:bg-gray-700 dark:border-gray-600 text-gray-700 dark:text-gray-200 p-3 rounded-md font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                <svg class="w-6 h-6 mr-2" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.87-2.13 15.84-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.11 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path><path fill="none" d="M0 0h48v48H0z"></path></svg>
+                Entrar com Google
+            </button>
+            <p id="auth-error" class="text-red-500 text-center mt-4 text-sm"></p>
+        </div>
+    </div>
+
+    <!-- Aplicativo de Chat -->
+    <div id="app" class="w-full h-screen hidden antialiased text-gray-800 dark:text-gray-200">
+        <div class="flex flex-row h-full w-full overflow-x-hidden">
+            <aside id="sidebar" class="flex flex-col w-full md:w-2/5 lg:w-1/3 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 transition-transform duration-300 ease-in-out transform translate-x-0">
+                <header class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+                    <h1 class="text-2xl font-bold text-blue-600 dark:text-blue-500">Blipp</h1>
+                    <div class="flex items-center space-x-2">
+                        <button id="add-friend-btn" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700" title="Adicionar Amigo">
+                            <i data-lucide="user-plus" class="w-6 h-6"></i>
+                        </button>
+                        <div class="relative">
+                            <button id="options-menu-button" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700" title="Configurações">
+                                <i data-lucide="more-vertical" class="w-6 h-6"></i>
+                            </button>
+                            <div id="options-menu" class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-md shadow-lg py-1 z-20 hidden">
+                                <a href="#" id="settings-btn" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600">Configurações</a>
+                                <a href="#" id="dark-mode-toggle" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600">Modo Escuro</a>
+                                <hr class="my-1 border-gray-200 dark:border-gray-600"/>
+                                <a href="#" id="logout-btn" class="block px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-600">Sair</a>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+                <div id="conversation-list" class="flex-1 overflow-y-auto">
+                     <div id="contacts-placeholder" class="hidden flex-col items-center justify-center h-full text-center p-4">
+                        <i data-lucide="users" class="w-16 h-16 text-gray-300 dark:text-gray-600"></i>
+                        <h2 class="mt-4 text-lg font-semibold text-gray-700 dark:text-gray-300">Sua lista de contatos está vazia</h2>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Clique no ícone <i data-lucide="user-plus" class="inline-block w-4 h-4"></i> acima para adicionar um amigo.</p>
+                    </div>
+                </div>
+            </aside>
+            <main id="chat-window" class="flex flex-col w-full h-full bg-gray-50 dark:bg-gray-900 absolute md:relative top-0 left-0 transition-transform duration-300 ease-in-out transform translate-x-full md:translate-x-0 md:w-3/5 lg:w-2/3">
+                 <div id="chat-placeholder" class="flex flex-col items-center justify-center h-full text-center">
+                    <i data-lucide="message-circle" class="w-24 h-24 text-gray-300 dark:text-gray-600"></i>
+                    <h2 class="mt-4 text-2xl font-semibold text-gray-700 dark:text-gray-300">Bem-vindo ao Blipp</h2>
+                    <p class="text-gray-500 dark:text-gray-400">Selecione um contato para começar.</p>
+                </div>
+                <div id="chat-content" class="hidden flex-col w-full h-full">
+                    <header class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                        <div class="flex items-center">
+                            <button id="back-to-sidebar" class="p-2 mr-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 md:hidden"><i data-lucide="arrow-left" class="w-6 h-6"></i></button>
+                            <img id="chat-avatar" src="" alt="Avatar" class="w-10 h-10 rounded-full mr-3 object-cover">
+                            <div><p id="chat-username" class="text-lg font-semibold"></p></div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button id="video-call-btn" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700" title="Chamada de Vídeo">
+                                <i data-lucide="video" class="w-6 h-6"></i>
+                            </button>
+                            <button id="voice-call-btn" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700" title="Chamada de Voz">
+                                <i data-lucide="phone" class="w-6 h-6"></i>
+                            </button>
+                            <div id="chat-options-wrapper" class="relative">
+                                <button id="chat-options-btn" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"><i data-lucide="more-vertical" class="w-6 h-6"></i></button>
+                                <div id="chat-options-menu" class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-md shadow-lg py-1 z-20 hidden">
+                                    <a href="#" id="block-contact-btn" class="block px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-600">Bloquear Contato</a>
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+                    <div id="message-container" class="flex-1 p-6 overflow-y-auto chat-bg">
+                        <div id="message-area" class="flex flex-col space-y-4"></div>
+                    </div>
+                    <footer class="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"><form id="message-form" class="flex items-center"><input id="message-input" type="text" placeholder="Digite uma mensagem" class="flex-1 mx-4 py-2 px-4 border rounded-full bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" autocomplete="off"><button type="submit" class="bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700 transition-colors"><i data-lucide="send" class="w-6 h-6"></i></button></form></footer>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modais -->
+    <div id="add-friend-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold">Adicionar Amigo</h3>
+                <button id="close-friend-modal-btn" class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">&times;</button>
+            </div>
+            <form id="add-friend-form">
+                <label for="add-friend-email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">E-mail do usuário</label>
+                <input type="email" id="add-friend-email" required class="w-full p-3 border rounded-md bg-gray-50 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <p id="add-friend-feedback" class="text-sm mt-2 h-5"></p>
+                <div class="mt-4 flex justify-end space-x-3">
+                    <button type="button" id="cancel-add-friend-btn" class="px-4 py-2 bg-gray-200 dark:bg-gray-600 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Adicionar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="settings-modal" class="hidden fixed inset-0 bg-gray-100 dark:bg-gray-900 z-50 flex flex-col">
+        <header class="flex items-center p-4 bg-white dark:bg-gray-800 shadow-md">
+            <button id="close-settings-btn" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                <i data-lucide="arrow-left" class="w-6 h-6"></i>
+            </button>
+            <h2 class="text-xl font-semibold ml-4">Configurações</h2>
+        </header>
+        <div class="flex-1 overflow-y-auto p-6">
+            <form id="profile-settings-form">
+                <div class="flex flex-col items-center mb-8">
+                    <div id="avatar-wrapper" class="relative group cursor-pointer">
+                        <img id="settings-avatar-preview" src="https://placehold.co/128x128/E2E8F0/4A5568?text=?" alt="Avatar" class="w-32 h-32 rounded-full object-cover border-4 border-white dark:border-gray-700 shadow-lg">
+                        <div class="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i data-lucide="camera" class="w-8 h-8 text-white"></i>
+                        </div>
+                    </div>
+                    <label class="mt-2 text-lg font-semibold cursor-pointer text-gray-700 dark:text-gray-300">Foto de Perfil</label>
+                    <p id="upload-feedback" class="text-sm mt-2 h-5"></p>
+                </div>
+                <div class="space-y-6">
+                    <div>
+                        <label for="display-name-input" class="block text-sm font-medium text-gray-500 dark:text-gray-400">Nome</label>
+                        <input type="text" id="display-name-input" class="mt-1 w-full p-3 border-b-2 bg-transparent border-gray-300 dark:border-gray-600 focus:outline-none focus:border-blue-500" placeholder="Seu nome">
+                    </div>
+                    <div>
+                        <label for="status-input" class="block text-sm font-medium text-gray-500 dark:text-gray-400">Status</label>
+                        <input type="text" id="status-input" class="mt-1 w-full p-3 border-b-2 bg-transparent border-gray-300 dark:border-gray-600 focus:outline-none focus:border-blue-500" placeholder="Defina seu status">
+                    </div>
+                </div>
+                <button type="submit" class="mt-8 w-full bg-blue-600 text-white p-3 rounded-md font-semibold hover:bg-blue-700 transition-colors">Salvar Alterações</button>
+                <p id="save-feedback" class="text-sm text-center mt-4 h-5"></p>
+            </form>
+            <hr class="my-8 border-gray-200 dark:border-gray-700">
+            <div class="space-y-4">
+                <a href="#" id="account-info-btn" class="flex items-center p-3 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800">
+                    <i data-lucide="key-round" class="w-6 h-6 mr-4 text-blue-500"></i>
+                    <span>Conta</span>
+                </a>
+                <a href="#" id="privacy-btn" class="flex items-center p-3 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800">
+                    <i data-lucide="lock" class="w-6 h-6 mr-4 text-red-500"></i>
+                    <span>Privacidade</span>
+                </a>
+                 <a href="#" id="blocked-contacts-btn" class="flex items-center p-3 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800">
+                    <i data-lucide="user-x" class="w-6 h-6 mr-4 text-gray-500"></i>
+                    <span>Contatos Bloqueados</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div id="account-info-modal" class="hidden fixed inset-0 bg-gray-100 dark:bg-gray-900 z-50 flex flex-col">
+        <header class="flex items-center p-4 bg-white dark:bg-gray-800 shadow-md">
+            <button id="back-to-settings-btn" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                <i data-lucide="arrow-left" class="w-6 h-6"></i>
+            </button>
+            <h2 class="text-xl font-semibold ml-4">Informações da Conta</h2>
+        </header>
+        <div class="flex-1 overflow-y-auto p-6 space-y-6">
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+                <h3 class="font-semibold mb-2 text-gray-700 dark:text-gray-300">Data de Criação</h3>
+                <p id="account-creation-date" class="text-gray-600 dark:text-gray-400">-</p>
+            </div>
+             <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+                <h3 class="font-semibold mb-2 text-gray-700 dark:text-gray-300">Tempo de Sessão</h3>
+                <p id="login-duration" class="text-gray-600 dark:text-gray-400">Calculando...</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+                <h3 class="font-semibold mb-2 text-gray-700 dark:text-gray-300">Histórico de Conversas</h3>
+                <ul id="conversation-history-list" class="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-1">
+                    <li>Nenhum contato encontrado.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div id="privacy-modal" class="hidden fixed inset-0 bg-gray-100 dark:bg-gray-900 z-50 flex flex-col">
+        <header class="flex items-center p-4 bg-white dark:bg-gray-800 shadow-md">
+            <button id="back-to-settings-from-privacy-btn" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                <i data-lucide="arrow-left" class="w-6 h-6"></i>
+            </button>
+            <h2 class="text-xl font-semibold ml-4">Privacidade</h2>
+        </header>
+        <div class="flex-1 overflow-y-auto p-6 space-y-8">
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+                <h3 class="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-200">Segurança</h3>
+                <div class="flex items-center justify-between">
+                    <label for="pin-lock-toggle" class="text-gray-700 dark:text-gray-300 font-medium">Proteger com senha</label>
+                    <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                        <input type="checkbox" name="pin-lock-toggle" id="pin-lock-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+                        <label for="pin-lock-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 dark:bg-gray-600 cursor-pointer"></label>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Ative para solicitar uma senha ao abrir o Blipp.</p>
+                <div id="pin-management-area" class="hidden mt-4">
+                    <form id="pin-form">
+                        <input type="password" id="pin-input" placeholder="Nova senha (4 dígitos)" maxlength="4" class="w-full mb-2 p-2 border rounded-md bg-gray-50 dark:bg-gray-700 dark:border-gray-600" pattern="\d{4}" required>
+                        <input type="password" id="pin-confirm-input" placeholder="Confirmar senha" maxlength="4" class="w-full mb-2 p-2 border rounded-md bg-gray-50 dark:bg-gray-700 dark:border-gray-600" pattern="\d{4}" required>
+                        <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700">Salvar Senha</button>
+                    </form>
+                    <button id="change-pin-btn" class="hidden w-full mt-2 bg-gray-500 text-white p-2 rounded-md hover:bg-gray-600">Alterar Senha</button>
+                    <p id="pin-feedback" class="text-sm text-center mt-2 h-5"></p>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+                <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">Backup de Conversas</h3>
+                 <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Faça o backup de suas mensagens e contatos para não perder suas conversas.</p>
+                <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                    <button id="backup-btn" class="flex-1 flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
+                        <i data-lucide="upload-cloud" class="w-5 h-5 mr-2"></i>
+                        Fazer Backup
+                    </button>
+                    <button id="restore-btn" class="flex-1 flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                        <i data-lucide="download-cloud" class="w-5 h-5 mr-2"></i>
+                        Restaurar
+                    </button>
+                    <input type="file" id="restore-file-input" class="hidden" accept=".json,.txt">
+                </div>
+                 <p id="backup-feedback" class="text-sm text-center mt-4 h-5"></p>
+            </div>
+        </div>
+    </div>
+    <div id="blocked-contacts-modal" class="hidden fixed inset-0 bg-gray-100 dark:bg-gray-900 z-50 flex flex-col">
+        <header class="flex items-center p-4 bg-white dark:bg-gray-800 shadow-md">
+            <button id="back-to-settings-from-blocked-btn" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                <i data-lucide="arrow-left" class="w-6 h-6"></i>
+            </button>
+            <h2 class="text-xl font-semibold ml-4">Contatos Bloqueados</h2>
+        </header>
+        <div id="blocked-contacts-list" class="flex-1 overflow-y-auto p-2">
+            <!-- Lista de contatos bloqueados será preenchida aqui -->
+        </div>
+    </div>
+    <div id="pin-lock-screen" class="hidden fixed inset-0 bg-gray-900 bg-opacity-90 z-50 flex items-center justify-center p-4">
+        <div class="w-full max-w-xs bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 text-center">
+            <i data-lucide="lock" class="w-12 h-12 mx-auto text-blue-500 mb-4"></i>
+            <h2 class="text-xl font-bold mb-2">Blipp está protegido</h2>
+            <p class="text-gray-600 dark:text-gray-300 mb-4">Digite sua senha para continuar.</p>
+            <form id="unlock-form">
+                <input type="password" id="unlock-pin-input" maxlength="4" class="w-full p-3 text-center text-2xl tracking-[.5em] border rounded-md bg-gray-50 dark:bg-gray-700 dark:border-gray-600" required>
+                <p id="unlock-error" class="text-red-500 text-sm h-5 mt-2"></p>
+                <button type="submit" class="w-full mt-4 bg-blue-600 text-white p-3 rounded-md font-semibold hover:bg-blue-700">Desbloquear</button>
+            </form>
+        </div>
+    </div>
+     <!-- Modal de Chamada -->
+    <div id="call-screen-modal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-90 z-50 flex flex-col items-center justify-center text-white p-4">
+        <!-- Elementos de áudio para WebRTC -->
+        <audio id="remoteAudio" autoplay></audio>
+        <audio id="localAudio" muted></audio>
+        
+        <div class="flex flex-col items-center justify-center text-center h-full">
+            <img id="call-avatar" src="https://placehold.co/128x128/E2E8F0/4A5568?text=?" alt="Avatar" class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg mb-4 pulse-ring">
+            <h2 id="call-username" class="text-3xl font-bold">Nome do Contato</h2>
+            <p id="call-status" class="text-lg mt-2">Chamando...</p>
+            <div class="absolute bottom-16 flex space-x-6">
+                <button id="mute-call-btn" class="bg-white bg-opacity-20 p-4 rounded-full hover:bg-opacity-30 transition-colors" title="Silenciar">
+                    <i data-lucide="mic" class="w-8 h-8"></i>
+                </button>
+                <button id="end-call-btn" class="bg-red-600 p-5 rounded-full hover:bg-red-700 transition-colors" title="Encerrar Chamada">
+                    <i data-lucide="phone-off" class="w-8 h-8"></i>
+                </button>
+                <button id="speaker-call-btn" class="bg-white bg-opacity-20 p-4 rounded-full hover:bg-opacity-30 transition-colors" title="Alto-falante">
+                    <i data-lucide="volume-2" class="w-8 h-8"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- Modal de Chamada Recebida -->
+    <div id="incoming-call-modal" class="hidden fixed bottom-5 right-5 bg-white dark:bg-gray-800 rounded-lg shadow-2xl z-50 p-4 w-80">
+        <div class="flex items-center">
+            <img id="incoming-call-avatar" src="https://placehold.co/48x48/E2E8F0/4A5568?text=?" class="w-12 h-12 rounded-full object-cover mr-4" alt="Caller Avatar">
+            <div class="flex-1">
+                <p id="incoming-call-username" class="font-semibold">Nome do Contato</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Chamada de voz recebida</p>
+            </div>
+        </div>
+        <div class="flex justify-end space-x-3 mt-4">
+            <button id="reject-call-btn" class="bg-red-500 p-2 rounded-full text-white hover:bg-red-600 transition-colors"><i data-lucide="phone-off" class="w-6 h-6"></i></button>
+            <button id="accept-call-btn" class="bg-green-500 p-2 rounded-full text-white hover:bg-green-600 transition-colors"><i data-lucide="phone" class="w-6 h-6"></i></button>
+        </div>
+    </div>
+
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, query, doc, getDoc, getDocs, where, setDoc, updateDoc, arrayUnion, arrayRemove, serverTimestamp, orderBy, addDoc, deleteDoc, collectionGroup, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Configuração Firebase ---
+            const firebaseConfig = {
+                 apiKey: "AIzaSyBWoduYmQY29JFPvFsYxeZ2dAwUPyd69yQ",
+                authDomain: "blipp-9fd4b.firebaseapp.com",
+                projectId: "blipp-9fd4b",
+                storageBucket: "blipp-9fd4b.appspot.com",
+                messagingSenderId: "984213948927",
+                appId: "1:984213948927:web:c7014d4b3b548ff7d0bfca"
+            };
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+            const db = getFirestore(app);
+            const provider = new GoogleAuthProvider();
+
+            // --- Variáveis de Estado ---
+            let currentUser = null;
+            let currentUserData = null; 
+            let activeChatId = null;
+            let activeChatUserId = null;
+            let activeCallData = null;
+            let activeCallUnsubscribe = null;
+            let unsubscribeFromMessages = null;
+            let unsubscribeFromContacts = null;
+            let unsubscribeFromCalls = null;
+            let uiInitialized = false;
+            let loginTimerInterval = null;
+
+             // --- Variáveis WebRTC ---
+            let peerConnection;
+            let localStream;
+            let remoteStream;
+            const servers = {
+                iceServers: [
+                    { urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] },
+                ],
+                iceCandidatePoolSize: 10,
+            };
+
+            
+            // --- Lógica de Autenticação e Sincronia de Perfil ---
+            onAuthStateChanged(auth, async (user) => {
+                const authContainer = document.getElementById('auth-container');
+                const appContainer = document.getElementById('app');
+                try {
+                    if (user) {
+                        currentUser = user;
+                        await ensureUserDocument(user);
+                        authContainer.classList.add('hidden');
+                        appContainer.classList.remove('hidden');
+                        checkLockState();
+                        loadContacts();
+                        listenForIncomingCalls();
+                        if (!uiInitialized) {
+                            initializeUI();
+                            uiInitialized = true;
+                        }
+                    } else {
+                        currentUser = null;
+                        currentUserData = null;
+                        authContainer.classList.remove('hidden');
+                        appContainer.classList.add('hidden');
+                        document.querySelectorAll('.fixed').forEach(modal => modal.classList.add('hidden'));
+                        if (unsubscribeFromContacts) unsubscribeFromContacts();
+                        if (unsubscribeFromMessages) unsubscribeFromMessages();
+                        if (unsubscribeFromCalls) unsubscribeFromCalls();
+                        if (activeCallUnsubscribe) activeCallUnsubscribe();
+                        if (loginTimerInterval) clearInterval(loginTimerInterval);
+                        uiInitialized = false; 
+                    }
+                } catch (error) {
+                    console.error("Erro crítico no onAuthStateChanged:", error);
+                    authContainer.classList.remove('hidden');
+                    appContainer.classList.add('hidden');
+                }
+            });
+
+            const ensureUserDocument = async (user) => {
+                const userDocRef = doc(db, "users", user.uid);
+                let userDocSnap = await getDoc(userDocRef);
+                if (!userDocSnap.exists()) {
+                     await setDoc(userDocRef, {
+                        uid: user.uid,
+                        email: user.email,
+                        displayName: user.displayName || user.email.split('@')[0],
+                        photoURL: user.photoURL || '',
+                        status: 'Olá! Estou usando o Blipp.',
+                        contacts: [],
+                        blockedContacts: []
+                    }, { merge: true });
+                    userDocSnap = await getDoc(userDocRef);
+                }
+                currentUserData = userDocSnap.data();
+            };
+
+            const handleAuthError = (error) => {
+                console.error("Auth Error:", error.code);
+                let message = "Ocorreu um erro. Verifique suas credenciais ou tente novamente.";
+                switch (error.code) {
+                    case 'auth/email-already-in-use': message = "Este e-mail já está cadastrado. Tente fazer login."; break;
+                    case 'auth/wrong-password': case 'auth/user-not-found': case 'auth/invalid-credential': message = "E-mail ou senha inválidos."; break;
+                    case 'auth/weak-password': message = "Sua senha deve ter no mínimo 6 caracteres."; break;
+                    case 'auth/invalid-email': message = "O formato do e-mail é inválido."; break;
+                }
+                document.getElementById('auth-error').textContent = message;
+            };
+            
+            // --- Lógica de Segurança (PIN) ---
+            function checkLockState() {
+                const appContainer = document.getElementById('app');
+                const pinLockScreen = document.getElementById('pin-lock-screen');
+                if (localStorage.getItem('app_pin')) {
+                    appContainer.classList.add('hidden');
+                    pinLockScreen.classList.remove('hidden');
+                    lucide.createIcons();
+                } else {
+                    appContainer.classList.remove('hidden');
+                    pinLockScreen.classList.add('hidden');
+                }
+            }
+
+            // --- Funções de Chamada de Voz (WebRTC) ---
+            async function setupCall(callId, calleeId) {
+                peerConnection = new RTCPeerConnection(servers);
+                localStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
+                remoteStream = new MediaStream();
+
+                localStream.getTracks().forEach(track => {
+                    peerConnection.addTrack(track, localStream);
+                });
+
+                document.getElementById('localAudio').srcObject = localStream;
+                document.getElementById('remoteAudio').srcObject = remoteStream;
+
+                peerConnection.ontrack = event => {
+                    event.streams[0].getTracks().forEach(track => {
+                        remoteStream.addTrack(track);
+                    });
+                };
+            }
+            
+            async function initiateVoiceCall() {
+                if (!activeChatUserId) return;
+
+                const callId = [currentUser.uid, activeChatUserId].sort().join('_');
+                const callDocRef = doc(db, "users", activeChatUserId, "calls", callId);
+                const callerCandidatesCollection = collection(callDocRef, 'callerCandidates');
+                const calleeCandidatesCollection = collection(callDocRef, 'calleeCandidates');
+
+                await setupCall(callId, activeChatUserId);
+                
+                peerConnection.onicecandidate = event => {
+                    event.candidate && addDoc(callerCandidatesCollection, event.candidate.toJSON());
+                };
+                
+                const offerDescription = await peerConnection.createOffer();
+                await peerConnection.setLocalDescription(offerDescription);
+
+                const offer = { sdp: offerDescription.sdp, type: offerDescription.type };
+                const calleeDoc = await getDoc(doc(db, "users", activeChatUserId));
+                const calleeData = calleeDoc.data();
+                
+                activeCallData = {
+                    callId,
+                    callerId: currentUser.uid,
+                    calleeId: activeChatUserId,
+                    callerInfo: { name: currentUserData.displayName, avatar: currentUserData.photoURL },
+                    calleeInfo: { name: calleeData.displayName, avatar: calleeData.photoURL },
+                    status: 'ringing',
+                    offer,
+                };
+                await setDoc(callDocRef, activeCallData);
+                showCallScreen(activeCallData, 'caller');
+
+                onSnapshot(callDocRef, (snapshot) => {
+                    const data = snapshot.data();
+                    if (!peerConnection.currentRemoteDescription && data?.answer) {
+                        const answerDescription = new RTCSessionDescription(data.answer);
+                        peerConnection.setRemoteDescription(answerDescription);
+                    }
+                });
+
+                onSnapshot(calleeCandidatesCollection, snapshot => {
+                    snapshot.docChanges().forEach(change => {
+                        if (change.type === 'added') {
+                            const candidate = new RTCIceCandidate(change.doc.data());
+                            peerConnection.addIceCandidate(candidate);
+                        }
+                    });
+                });
+            }
+
+            function listenForIncomingCalls() {
+                if (unsubscribeFromCalls) unsubscribeFromCalls();
+                if (!currentUser) return;
+                const callsCollectionRef = collection(db, "users", currentUser.uid, "calls");
+                const q = query(callsCollectionRef, where("status", "==", "ringing"));
+                
+                unsubscribeFromCalls = onSnapshot(q, (snapshot) => {
+                     snapshot.docChanges().forEach(async (change) => {
+                        if (change.type === "added") {
+                            const callData = change.doc.data();
+                            if (activeCallData && activeCallData.callId === callData.callId) return; // Já está em uma chamada
+                            activeCallData = callData;
+                            activeCallData.callId = change.doc.id;
+                            showIncomingCallUI(activeCallData);
+                        }
+                    });
+                }, (error) => console.error("Erro no listener de chamadas:", error));
+            }
+             
+            function showIncomingCallUI(callData) {
+                document.getElementById('incoming-call-username').textContent = callData.callerInfo.name;
+                const callerInitial = (callData.callerInfo.name || '?')[0].toUpperCase();
+                document.getElementById('incoming-call-avatar').src = callData.callerInfo.avatar || `https://placehold.co/48x48/E2E8F0/4A5568?text=${callerInitial}`;
+                document.getElementById('incoming-call-modal').classList.remove('hidden');
+                lucide.createIcons();
+            }
+
+            async function acceptCall() {
+                if (!activeCallData) return;
+                
+                const callId = activeCallData.callId;
+                const callDocRef = doc(db, "users", currentUser.uid, "calls", callId);
+                const callerCandidatesCollection = collection(callDocRef, 'callerCandidates');
+                const calleeCandidatesCollection = collection(callDocRef, 'calleeCandidates');
+
+                await setupCall(callId, activeCallData.callerId);
+
+                peerConnection.onicecandidate = event => {
+                    event.candidate && addDoc(calleeCandidatesCollection, event.candidate.toJSON());
+                };
+                
+                const offerDescription = activeCallData.offer;
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(offerDescription));
+
+                const answerDescription = await peerConnection.createAnswer();
+                await peerConnection.setLocalDescription(answerDescription);
+                
+                const answer = { type: answerDescription.type, sdp: answerDescription.sdp };
+                await updateDoc(callDocRef, { answer, status: 'connected' });
+                
+                onSnapshot(callerCandidatesCollection, snapshot => {
+                    snapshot.docChanges().forEach(change => {
+                        if (change.type === 'added') {
+                            const candidate = new RTCIceCandidate(change.doc.data());
+                            peerConnection.addIceCandidate(candidate);
+                        }
+                    });
+                });
+
+                document.getElementById('incoming-call-modal').classList.add('hidden');
+                showCallScreen(activeCallData, 'callee');
+            }
+
+
+            async function rejectCall() {
+                if (!activeCallData) return;
+                try {
+                    const callDocRef = doc(db, "users", currentUser.uid, "calls", activeCallData.callId);
+                    await updateDoc(callDocRef, { status: 'rejected' });
+                    document.getElementById('incoming-call-modal').classList.add('hidden');
+                    activeCallData = null;
+                } catch (error) {
+                    console.error("Erro ao rejeitar chamada:", error);
+                }
+            }
+            
+            async function endCall() {
+                 if (!activeCallData) {
+                    document.getElementById('call-screen-modal').classList.add('hidden');
+                    return;
+                }
+
+                if (localStream) {
+                    localStream.getTracks().forEach(track => track.stop());
+                }
+                if (peerConnection) {
+                    peerConnection.close();
+                }
+
+                const callDataToEnd = { ...activeCallData };
+                activeCallData = null; 
+
+                try {
+                    const callDocRef = doc(db, "users", callDataToEnd.calleeId, "calls", callDataToEnd.callId);
+                    const docSnap = await getDoc(callDocRef);
+
+                    if (docSnap.exists() && docSnap.data().status !== 'ended') {
+                        await updateDoc(callDocRef, { status: 'ended' });
+                    }
+                    
+                    document.getElementById('call-screen-modal').classList.add('hidden');
+                    
+                    if (currentUser && currentUser.uid === callDataToEnd.callerId) {
+                        const callerCandidatesQuery = query(collection(callDocRef, 'callerCandidates'));
+                        const calleeCandidatesQuery = query(collection(callDocRef, 'calleeCandidates'));
+
+                        const [callerCandidatesSnapshot, calleeCandidatesSnapshot] = await Promise.all([
+                            getDocs(callerCandidatesQuery),
+                            getDocs(calleeCandidatesQuery)
+                        ]);
+                        
+                        const batch = writeBatch(db);
+                        callerCandidatesSnapshot.forEach(doc => batch.delete(doc.ref));
+                        calleeCandidatesSnapshot.forEach(doc => batch.delete(doc.ref));
+                        await batch.commit();
+
+                         setTimeout(async () => {
+                            try {
+                                await deleteDoc(callDocRef);
+                            } catch (deleteError) {
+                                console.error("Erro ao deletar documento da chamada:", deleteError);
+                            }
+                        }, 500);
+                    }
+                } catch (error) {
+                    console.error("Erro ao encerrar chamada:", error);
+                    document.getElementById('call-screen-modal').classList.add('hidden');
+                }
+            }
+
+
+            function showCallScreen(callData, role) {
+                if (activeCallUnsubscribe) activeCallUnsubscribe();
+
+                const contactInfo = (role === 'caller') ? callData.calleeInfo : callData.callerInfo;
+                document.getElementById('call-username').textContent = contactInfo.name;
+                const contactInitial = (contactInfo.name || '?')[0].toUpperCase();
+                document.getElementById('call-avatar').src = contactInfo.avatar || `https://placehold.co/128x128/E2E8F0/4A5568?text=${contactInitial}`;
+                document.getElementById('call-status').textContent = (role === 'caller' && callData.status === 'ringing') ? "Chamando..." : "Conectado";
+                document.getElementById('call-screen-modal').classList.remove('hidden');
+                lucide.createIcons();
+
+                const callDocRef = doc(db, "users", callData.calleeId, "calls", callData.callId);
+                
+                activeCallUnsubscribe = onSnapshot(callDocRef, (docSnap) => {
+                     if (!docSnap.exists() || ['ended', 'rejected'].includes(docSnap.data().status)) {
+                        endCall();
+                        if (activeCallUnsubscribe) {
+                            activeCallUnsubscribe();
+                            activeCallUnsubscribe = null;
+                        }
+                        return;
+                     }
+                    
+                    const updatedCallData = docSnap.data();
+                    activeCallData = updatedCallData;
+                    if(activeCallData) activeCallData.callId = docSnap.id;
+                    
+                    if(updatedCallData.status === 'connected') {
+                        document.getElementById('call-status').textContent = 'Conectado';
+                    }
+                });
+            }
+
+            function toggleMute() {
+                if (!localStream) return;
+                const micIcon = document.querySelector('#mute-call-btn i');
+                localStream.getAudioTracks().forEach(track => {
+                    track.enabled = !track.enabled;
+                    if (track.enabled) {
+                        micIcon.dataset.lucide = "mic";
+                    } else {
+                        micIcon.dataset.lucide = "mic-off";
+                    }
+                    lucide.createIcons();
+                });
+            }
+             function toggleSpeaker() {
+                const remoteAudio = document.getElementById('remoteAudio');
+                remoteAudio.muted = !remoteAudio.muted; // Simple toggle, not a true speakerphone
+                 const speakerIcon = document.querySelector('#speaker-call-btn i');
+                 if(remoteAudio.muted){
+                    speakerIcon.dataset.lucide = "volume-x";
+                 } else {
+                    speakerIcon.dataset.lucide = "volume-2";
+                 }
+                 lucide.createIcons();
+            }
+
+            // --- Funções de Chat e Contatos ---
+            function loadContacts() {
+                if (unsubscribeFromContacts) unsubscribeFromContacts();
+                const userDocRef = doc(db, "users", currentUser.uid);
+                unsubscribeFromContacts = onSnapshot(userDocRef, async (userDoc) => {
+                    if (!userDoc.exists()) return;
+                    currentUserData = userDoc.data();
+                    const contactUids = currentUserData.contacts || [];
+                    const blockedUids = currentUserData.blockedContacts || [];
+                    const visibleContactUids = contactUids.filter(uid => !blockedUids.includes(uid));
+
+                    const conversationList = document.getElementById('conversation-list');
+                    const contactsPlaceholder = document.getElementById('contacts-placeholder');
+
+                    if (visibleContactUids.length > 0) {
+                        contactsPlaceholder.classList.add('hidden');
+                        const usersRef = collection(db, "users");
+                        const q = query(usersRef, where("uid", "in", visibleContactUids));
+                        const querySnapshot = await getDocs(q);
+                        
+                        conversationList.innerHTML = '';
+                        querySnapshot.forEach(doc => {
+                            const user = doc.data();
+                            const userInitial = (user.displayName || user.email)[0].toUpperCase();
+                            const userElement = document.createElement('div');
+                            userElement.className = "flex items-center p-4 cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-700 border-b border-gray-200 dark:border-gray-700 conversation-item";
+                            userElement.dataset.userId = user.uid;
+                            userElement.dataset.userName = user.displayName || user.email;
+                            userElement.dataset.avatarText = userInitial;
+                            userElement.dataset.avatarUrl = user.photoURL || '';
+                            userElement.innerHTML = `<img src="${user.photoURL || `https://placehold.co/48x48/E2E8F0/4A5568?text=${userInitial}`}" alt="Avatar" class="w-12 h-12 rounded-full mr-4 object-cover"><div class="flex-1"><p class="text-md font-semibold">${user.displayName || user.email}</p></div>`;
+                            conversationList.appendChild(userElement);
+                        });
+                    } else {
+                        conversationList.innerHTML = '';
+                        contactsPlaceholder.classList.remove('hidden');
+                        lucide.createIcons();
+                    }
+                }, (error) => console.error("Error loading contacts:", error));
+            }
+            function addFriendByEmail(e) {
+                e.preventDefault();
+                const email = document.getElementById('add-friend-email').value.trim();
+                const addFriendFeedback = document.getElementById('add-friend-feedback');
+                addFriendFeedback.textContent = '';
+                if (email === currentUser.email) { addFriendFeedback.textContent = "Você não pode adicionar a si mesmo."; addFriendFeedback.className = "text-sm mt-2 h-5 text-yellow-600"; return; }
+                const usersRef = collection(db, "users");
+                const q = query(usersRef, where("email", "==", email));
+                getDocs(q).then(querySnapshot => {
+                    if (querySnapshot.empty) { addFriendFeedback.textContent = "Usuário não encontrado."; addFriendFeedback.className = "text-sm mt-2 h-5 text-red-500";
+                    } else {
+                        const friendDoc = querySnapshot.docs[0];
+                        const friendId = friendDoc.id;
+                        const userDocRef = doc(db, "users", currentUser.uid);
+                        addFriendFeedback.textContent = "Usuário adicionado com sucesso!";
+                        addFriendFeedback.className = "text-sm mt-2 h-5 text-green-500";
+                        updateDoc(userDocRef, { contacts: arrayUnion(friendId) });
+                        setTimeout(() => { document.getElementById('add-friend-modal').classList.add('hidden'); addFriendFeedback.textContent = ''; document.getElementById('add-friend-form').reset(); }, 1500);
+                    }
+                });
+            }
+            function openChat(userId, userName, avatarText, avatarUrl) {
+                document.getElementById('chat-placeholder').classList.add('hidden'); 
+                document.getElementById('chat-content').classList.add('flex'); 
+                document.getElementById('chat-content').classList.remove('hidden');
+                
+                activeChatUserId = userId; 
+                const chatId = [currentUser.uid, activeChatUserId].sort().join('_');
+                activeChatId = chatId;
+                
+                document.getElementById('chat-username').textContent = userName;
+                document.getElementById('chat-avatar').src = avatarUrl || `https://placehold.co/40x40/E2E8F0/4A5568?text=${avatarText}`;
+                if (unsubscribeFromMessages) unsubscribeFromMessages();
+                const messagesRef = collection(db, 'chats', chatId, 'messages');
+                const q = query(messagesRef, orderBy('timestamp'));
+                const messageArea = document.getElementById('message-area');
+                unsubscribeFromMessages = onSnapshot(q, (snapshot) => {
+                    messageArea.innerHTML = '';
+                    snapshot.forEach(doc => { const msg = doc.data(); const msgEl = createMessageElement(msg, currentUser.uid); messageArea.appendChild(msgEl); });
+                    document.getElementById('message-container').scrollTop = document.getElementById('message-container').scrollHeight;
+                }, (error) => console.error(`Error loading messages for chat ${activeChatId}:`, error));
+                if (window.innerWidth < 768) { document.getElementById('sidebar').classList.add('-translate-x-full'); document.getElementById('chat-window').classList.remove('translate-x-full'); }
+            }
+            function sendMessage(e) { 
+                e.preventDefault(); 
+                const messageInput = document.getElementById('message-input');
+                const text = messageInput.value.trim(); 
+                if (text && activeChatId && currentUser) { 
+                    messageInput.value = ''; 
+                    addDoc(collection(db, 'chats', activeChatId, 'messages'), { text: text, senderId: currentUser.uid, timestamp: serverTimestamp() }); 
+                } 
+            }
+            function createMessageElement(message, currentUserId) { 
+                const isSent = message.senderId === currentUserId; 
+                const el = document.createElement('div'); 
+                el.className = `flex items-end ${isSent ? 'justify-end' : ''}`; 
+                el.innerHTML = `<div class="flex flex-col space-y-1 text-sm max-w-xs mx-2 ${isSent ? 'order-1 items-end' : 'order-2 items-start'}"><div><span class="px-4 py-2 rounded-lg inline-block shadow ${isSent ? 'rounded-br-none bg-blue-600 text-white' : 'rounded-bl-none bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200'}">${message.text}</span></div></div>`; 
+                return el; 
+            }
+            async function blockCurrentUser() {
+                if (!activeChatUserId) return;
+                const userDocRef = doc(db, "users", currentUser.uid);
+                await updateDoc(userDocRef, {
+                    blockedContacts: arrayUnion(activeChatUserId)
+                });
+                document.getElementById('chat-content').classList.add('hidden');
+                document.getElementById('chat-options-menu').classList.add('hidden');
+                document.getElementById('chat-placeholder').classList.remove('hidden');
+            }
+
+
+            // --- Funções de Configurações e Telas Adicionais ---
+            function openSettings() {
+                if (!currentUserData) { console.error("Cannot open settings: user data not loaded."); return; }
+                const userInitial = (currentUserData.displayName || currentUserData.email)[0].toUpperCase();
+                document.getElementById('settings-avatar-preview').src = currentUserData.photoURL || `https://placehold.co/128x128/E2E8F0/4A5568?text=${userInitial}`;
+                document.getElementById('display-name-input').value = currentUserData.displayName || '';
+                document.getElementById('status-input').value = currentUserData.status || '';
+                document.getElementById('settings-modal').classList.remove('hidden');
+                lucide.createIcons();
+            }
+            async function saveProfileSettings(e) {
+                e.preventDefault();
+                const newDisplayName = document.getElementById('display-name-input').value.trim();
+                const newStatus = document.getElementById('status-input').value.trim();
+                const saveFeedback = document.getElementById('save-feedback');
+                saveFeedback.textContent = 'Salvando...';
+                saveFeedback.className = 'text-sm text-center mt-4 h-5 text-blue-500';
+                try {
+                    await updateDoc(doc(db, "users", currentUser.uid), { displayName: newDisplayName, status: newStatus });
+                    currentUserData.displayName = newDisplayName;
+                    currentUserData.status = newStatus;
+                    saveFeedback.textContent = 'Perfil salvo com sucesso!';
+                    saveFeedback.className = 'text-sm text-center mt-4 h-5 text-green-500';
+                    setTimeout(() => { saveFeedback.textContent = ''; }, 2000);
+                } catch (error) {
+                    console.error("Error saving profile:", error);
+                    saveFeedback.textContent = 'Não foi possível salvar as alterações.';
+                    saveFeedback.className = 'text-sm text-center mt-4 h-5 text-red-500';
+                }
+            }
+            function openAccountInfo() {
+                if (!currentUser || !currentUserData) return;
+                const creationTime = new Date(currentUser.metadata.creationTime);
+                document.getElementById('account-creation-date').textContent = creationTime.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                const lastSignInTime = new Date(currentUser.metadata.lastSignInTime);
+                if (loginTimerInterval) clearInterval(loginTimerInterval);
+                function updateLoginDuration() {
+                    const now = new Date();
+                    const diffMs = now - lastSignInTime;
+                    const diffMins = Math.floor(diffMs / 60000);
+                    const diffHours = Math.floor(diffMins / 60);
+                    const mins = diffMins % 60;
+                    document.getElementById('login-duration').textContent = diffHours > 0 ? `Logado há ${diffHours}h e ${mins}min` : `Logado há ${diffMins} minuto(s)`;
+                }
+                updateLoginDuration();
+                loginTimerInterval = setInterval(updateLoginDuration, 60000);
+                const contactUids = currentUserData.contacts || [];
+                const conversationHistoryListEl = document.getElementById('conversation-history-list');
+                if (contactUids.length === 0) {
+                    conversationHistoryListEl.innerHTML = '<li>Você ainda não adicionou contatos.</li>';
+                } else {
+                    conversationHistoryListEl.innerHTML = '<li>Carregando contatos...</li>';
+                    const usersRef = collection(db, "users");
+                    const q = query(usersRef, where("uid", "in", contactUids));
+                    getDocs(q).then(querySnapshot => {
+                        conversationHistoryListEl.innerHTML = '';
+                        querySnapshot.forEach(doc => {
+                            const user = doc.data();
+                            const li = document.createElement('li');
+                            li.textContent = user.displayName || user.email;
+                            conversationHistoryListEl.appendChild(li);
+                        });
+                    });
+                }
+                document.getElementById('settings-modal').classList.add('hidden');
+                document.getElementById('account-info-modal').classList.remove('hidden');
+                lucide.createIcons();
+            }
+            function closeAccountInfo() {
+                if (loginTimerInterval) clearInterval(loginTimerInterval);
+                document.getElementById('account-info-modal').classList.add('hidden');
+                document.getElementById('settings-modal').classList.remove('hidden');
+            }
+            function openPrivacySettings() {
+                document.getElementById('settings-modal').classList.add('hidden');
+                document.getElementById('privacy-modal').classList.remove('hidden');
+                updatePinLockUI();
+                lucide.createIcons();
+            }
+            function closePrivacySettings() {
+                document.getElementById('privacy-modal').classList.add('hidden');
+                document.getElementById('settings-modal').classList.remove('hidden');
+            }
+            async function openBlockedContacts() {
+                document.getElementById('settings-modal').classList.add('hidden');
+                document.getElementById('blocked-contacts-modal').classList.remove('hidden');
+                const blockedUids = currentUserData.blockedContacts || [];
+                const blockedContactsList = document.getElementById('blocked-contacts-list');
+                blockedContactsList.innerHTML = '';
+                if (blockedUids.length === 0) {
+                    blockedContactsList.innerHTML = `<p class="text-center text-gray-500 p-4">Você não bloqueou nenhum contato.</p>`;
+                    return;
+                }
+                const usersRef = collection(db, "users");
+                const q = query(usersRef, where("uid", "in", blockedUids));
+                const querySnapshot = await getDocs(q);
+                querySnapshot.forEach(doc => {
+                    const user = doc.data();
+                    const userInitial = (user.displayName || user.email)[0].toUpperCase();
+                    const userEl = document.createElement('div');
+                    userEl.className = "flex items-center justify-between p-3 border-b dark:border-gray-700";
+                    userEl.innerHTML = `<div class="flex items-center"><img src="${user.photoURL || `https://placehold.co/40x40/E2E8F0/4A5568?text=${userInitial}`}" class="w-10 h-10 rounded-full mr-3 object-cover"><span>${user.displayName || user.email}</span></div><button data-uid="${user.uid}" class="unblock-btn px-3 py-1 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600">Desbloquear</button>`;
+                    blockedContactsList.appendChild(userEl);
+                });
+            }
+            async function unblockUser(uid) {
+                const userDocRef = doc(db, "users", currentUser.uid);
+                await updateDoc(userDocRef, { blockedContacts: arrayRemove(uid) });
+                currentUserData.blockedContacts = currentUserData.blockedContacts.filter(id => id !== uid);
+                openBlockedContacts();
+                loadContacts();
+            }
+            function closeBlockedContacts() {
+                document.getElementById('blocked-contacts-modal').classList.add('hidden');
+                document.getElementById('settings-modal').classList.remove('hidden');
+            }
+            function updatePinLockUI() {
+                const pinIsSet = !!localStorage.getItem('app_pin');
+                document.getElementById('pin-lock-toggle').checked = pinIsSet;
+                if (pinIsSet) {
+                    document.getElementById('pin-management-area').classList.remove('hidden');
+                    document.getElementById('pin-form').classList.add('hidden');
+                    document.getElementById('change-pin-btn').classList.remove('hidden');
+                } else {
+                    document.getElementById('pin-management-area').classList.add('hidden');
+                }
+            }
+            function handlePinToggleChange(e) {
+                if (e.target.checked) {
+                    document.getElementById('pin-management-area').classList.remove('hidden');
+                    document.getElementById('pin-form').classList.remove('hidden');
+                    document.getElementById('change-pin-btn').classList.add('hidden');
+                    document.getElementById('pin-input').focus();
+                } else {
+                    localStorage.removeItem('app_pin');
+                    document.getElementById('pin-management-area').classList.add('hidden');
+                    document.getElementById('pin-feedback').textContent = "Proteção desativada.";
+                    document.getElementById('pin-feedback').className = "text-sm text-center mt-2 h-5 text-yellow-500";
+                    setTimeout(() => document.getElementById('pin-feedback').textContent = "", 3000);
+                }
+            }
+            function savePin(e) {
+                e.preventDefault();
+                const pinInput = document.getElementById('pin-input');
+                const pinConfirmInput = document.getElementById('pin-confirm-input');
+                const pinFeedback = document.getElementById('pin-feedback');
+                const pin = pinInput.value;
+                const confirmPin = pinConfirmInput.value;
+                if (pin.length !== 4) { pinFeedback.textContent = "A senha deve ter 4 dígitos."; pinFeedback.className = "text-sm text-center mt-2 h-5 text-red-500"; return; }
+                if (pin !== confirmPin) { pinFeedback.textContent = "As senhas não coincidem."; pinFeedback.className = "text-sm text-center mt-2 h-5 text-red-500"; return; }
+                localStorage.setItem('app_pin', pin);
+                pinFeedback.textContent = "Senha salva com sucesso!";
+                pinFeedback.className = "text-sm text-center mt-2 h-5 text-green-500";
+                document.getElementById('pin-form').reset();
+                setTimeout(() => { pinFeedback.textContent = ""; updatePinLockUI(); }, 2000);
+            }
+            function unlockApp(e) {
+                e.preventDefault();
+                const unlockPinInput = document.getElementById('unlock-pin-input');
+                const unlockError = document.getElementById('unlock-error');
+                const enteredPin = unlockPinInput.value;
+                const savedPin = localStorage.getItem('app_pin');
+                if (enteredPin === savedPin) {
+                    document.getElementById('pin-lock-screen').classList.add('hidden');
+                    document.getElementById('app').classList.remove('hidden');
+                    unlockPinInput.value = '';
+                    unlockError.textContent = "";
+                } else {
+                    unlockError.textContent = "Senha incorreta.";
+                    unlockPinInput.value = '';
+                }
+            }
+            function createAndDownloadBackup() {
+                 if (!currentUserData) {
+                    document.getElementById('backup-feedback').textContent = "Dados do usuário não carregados.";
+                    return;
+                }
+                const backupData = { profile: currentUserData };
+                const dataStr = JSON.stringify(backupData, null, 2);
+                const dataBlob = new Blob([dataStr], {type: "application/json"});
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `blipp_backup_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                document.getElementById('backup-feedback').textContent = "Backup gerado com sucesso!";
+                document.getElementById('backup-feedback').className = "text-sm text-center mt-4 h-5 text-green-500";
+                setTimeout(() => document.getElementById('backup-feedback').textContent = "", 3000);
+            }
+            function handleRestoreUpload(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const restoredData = JSON.parse(e.target.result);
+                        console.log("Dados do backup:", restoredData);
+                        document.getElementById('backup-feedback').textContent = "Backup carregado. Função de restaurar em desenvolvimento.";
+                        document.getElementById('backup-feedback').className = "text-sm text-center mt-4 h-5 text-blue-500";
+                    } catch (err) {
+                        document.getElementById('backup-feedback').textContent = "Arquivo de backup inválido.";
+                        document.getElementById('backup-feedback').className = "text-sm text-center mt-4 h-5 text-red-500";
+                    } finally {
+                        document.getElementById('restore-file-input').value = ""; 
+                        setTimeout(() => document.getElementById('backup-feedback').textContent = "", 5000);
+                    }
+                };
+                reader.readAsText(file);
+            }
+            async function handleAvatarUrlChange() {
+                const imageUrl = prompt("Por favor, cole o URL da sua nova foto de perfil:", currentUserData.photoURL || "");
+                if (imageUrl && imageUrl.trim() !== "") {
+                    const feedbackEl = document.getElementById('upload-feedback');
+                    feedbackEl.textContent = 'Salvando...';
+                    feedbackEl.className = "text-sm mt-2 h-5 text-blue-500";
+                    try {
+                        if (!imageUrl.match(/\.(jpeg|jpg|gif|png)$/i)) { throw new Error("URL de imagem inválido."); }
+                        await updateDoc(doc(db, "users", currentUser.uid), { photoURL: imageUrl });
+                        currentUserData.photoURL = imageUrl;
+                        document.getElementById('settings-avatar-preview').src = imageUrl;
+                        feedbackEl.textContent = 'Foto atualizada!';
+                        feedbackEl.className = "text-sm mt-2 h-5 text-green-500";
+                    } catch (error) {
+                        console.error("Erro ao salvar URL da foto:", error);
+                        feedbackEl.textContent = 'Falha ao salvar. URL inválido?';
+                        feedbackEl.className = "text-sm mt-2 h-5 text-red-500";
+                    } finally {
+                         setTimeout(() => { feedbackEl.textContent = ''; }, 3000);
+                    }
+                }
+            }
+            
+            // --- Inicialização da UI ---
+            function initializeUI() {
+                lucide.createIcons();
+                
+                document.getElementById('conversation-list').addEventListener('click', (e) => { const item = e.target.closest('.conversation-item'); if (item) openChat(item.dataset.userId, item.dataset.userName, item.dataset.avatarText, item.dataset.avatarUrl); });
+                document.getElementById('message-form').addEventListener('submit', sendMessage);
+                const darkModeToggle = document.getElementById('dark-mode-toggle');
+                const updateDarkModeButton = () => { darkModeToggle.textContent = document.documentElement.classList.contains('dark') ? 'Modo Claro' : 'Modo Escuro'; };
+                darkModeToggle.addEventListener('click', (e) => { e.preventDefault(); document.documentElement.classList.toggle('dark'); localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light'); updateDarkModeButton(); });
+                document.getElementById('settings-btn').addEventListener('click', (e) => { e.preventDefault(); document.getElementById('options-menu').classList.add('hidden'); openSettings(); });
+                document.getElementById('logout-btn').addEventListener('click', () => { localStorage.removeItem('app_pin'); signOut(auth); });
+                document.getElementById('options-menu-button').addEventListener('click', () => document.getElementById('options-menu').classList.toggle('hidden'));
+                document.addEventListener('click', (e) => { 
+                    const optionsMenuButton = document.getElementById('options-menu-button'); const optionsMenu = document.getElementById('options-menu');
+                    const chatOptionsBtn = document.getElementById('chat-options-btn'); const chatOptionsMenu = document.getElementById('chat-options-menu');
+                    if (optionsMenuButton && !optionsMenuButton.contains(e.target) && optionsMenu && !optionsMenu.contains(e.target)) { optionsMenu.classList.add('hidden'); }
+                    if (chatOptionsBtn && !chatOptionsBtn.contains(e.target) && chatOptionsMenu && !chatOptionsMenu.contains(e.target)) { chatOptionsMenu.classList.add('hidden'); }
+                });
+                document.getElementById('back-to-sidebar').addEventListener('click', () => { document.getElementById('sidebar').classList.remove('-translate-x-full'); document.getElementById('chat-window').classList.add('translate-x-full'); });
+                document.getElementById('add-friend-btn').addEventListener('click', () => document.getElementById('add-friend-modal').classList.remove('hidden'));
+                document.getElementById('close-friend-modal-btn').addEventListener('click', () => document.getElementById('add-friend-modal').classList.add('hidden'));
+                document.getElementById('cancel-add-friend-btn').addEventListener('click', () => document.getElementById('add-friend-modal').classList.add('hidden'));
+                document.getElementById('add-friend-form').addEventListener('submit', addFriendByEmail);
+                document.getElementById('close-settings-btn').addEventListener('click', () => document.getElementById('settings-modal').classList.add('hidden'));
+                document.getElementById('avatar-wrapper').addEventListener('click', handleAvatarUrlChange);
+                document.getElementById('profile-settings-form').addEventListener('submit', saveProfileSettings);
+                document.getElementById('account-info-btn').addEventListener('click', openAccountInfo);
+                document.getElementById('back-to-settings-btn').addEventListener('click', closeAccountInfo);
+                document.getElementById('privacy-btn').addEventListener('click', openPrivacySettings);
+                document.getElementById('back-to-settings-from-privacy-btn').addEventListener('click', closePrivacySettings);
+                document.getElementById('backup-btn').addEventListener('click', createAndDownloadBackup);
+                document.getElementById('restore-btn').addEventListener('click', () => document.getElementById('restore-file-input').click());
+                document.getElementById('restore-file-input').addEventListener('change', handleRestoreUpload);
+                document.getElementById('pin-lock-toggle').addEventListener('change', handlePinToggleChange);
+                document.getElementById('pin-form').addEventListener('submit', savePin);
+                document.getElementById('change-pin-btn').addEventListener('click', () => { document.getElementById('pin-form').classList.remove('hidden'); document.getElementById('change-pin-btn').classList.add('hidden'); document.getElementById('pin-input').focus(); });
+                document.getElementById('unlock-form').addEventListener('submit', unlockApp);
+                document.getElementById('blocked-contacts-btn').addEventListener('click', openBlockedContacts);
+                document.getElementById('back-to-settings-from-blocked-btn').addEventListener('click', closeBlockedContacts);
+                document.getElementById('blocked-contacts-list').addEventListener('click', (e) => { if(e.target.classList.contains('unblock-btn')) { const uidToUnblock = e.target.dataset.uid; unblockUser(uidToUnblock); } });
+                document.getElementById('chat-options-btn').addEventListener('click', () => document.getElementById('chat-options-menu').classList.toggle('hidden'));
+                document.getElementById('block-contact-btn').addEventListener('click', blockCurrentUser);
+
+                // Listeners de chamada
+                document.getElementById('voice-call-btn').addEventListener('click', initiateVoiceCall);
+                document.getElementById('end-call-btn').addEventListener('click', endCall);
+                document.getElementById('accept-call-btn').addEventListener('click', acceptCall);
+                document.getElementById('reject-call-btn').addEventListener('click', rejectCall);
+                document.getElementById('mute-call-btn').addEventListener('click', toggleMute);
+                document.getElementById('speaker-call-btn').addEventListener('click', toggleSpeaker);
+
+                updateDarkModeButton();
+            }
+
+            // Adiciona os listeners de autenticação
+            document.getElementById('signup-form').addEventListener('submit', async (e) => { e.preventDefault(); document.getElementById('auth-error').textContent = ''; const email = document.getElementById('signup-email').value; const password = document.getElementById('signup-password').value; try { await createUserWithEmailAndPassword(auth, email, password); } catch (error) { handleAuthError(error); } });
+            document.getElementById('login-form').addEventListener('submit', async (e) => { e.preventDefault(); document.getElementById('auth-error').textContent = ''; const email = document.getElementById('login-email').value; const password = document.getElementById('login-password').value; try { await signInWithEmailAndPassword(auth, email, password); } catch (error) { handleAuthError(error); } });
+            document.getElementById('google-login-btn').addEventListener('click', async () => { document.getElementById('auth-error').textContent = ''; try { await signInWithPopup(auth, provider); } catch (error) { handleAuthError(error); } });
+            document.getElementById('show-signup').addEventListener('click', (e) => { e.preventDefault(); document.getElementById('login-form').classList.add('hidden'); document.getElementById('signup-form').classList.remove('hidden'); });
+            document.getElementById('show-login').addEventListener('click', (e) => { e.preventDefault(); document.getElementById('signup-form').classList.add('hidden'); document.getElementById('login-form').classList.remove('hidden'); });
+        });
+    </script>
+</body>
+</html>
+```
+
+As principais mudanças foram:
+
+1.  **HTML**: Adicionei dois elementos `<audio>` escondidos dentro do modal de chamada para gerenciar o som do seu microfone e o som do outro usuário.
+2.  **JavaScript (WebRTC)**:
+    * Incorporei a lógica completa do WebRTC nas funções `initiateVoiceCall`, `acceptCall` e `endCall`. Agora, elas trocam as informações necessárias para que os navegadores se conectem e transmitam áudio.
+    * O aplicativo agora solicita permissão para usar o microfone quando uma chamada é iniciada ou aceita.
+    * A função `endCall` foi aprimorada para desligar corretamente a conexão e os microfones.
+3.  **Botões de Controle**: As funções `toggleMute` e `toggleSpeaker` foram implementadas para controlar o microfone e o áudio durante a chamada, com os ícones mudando para refletir o estado atual.
+4.  **Limpeza de Dados**: Melhorei a lógica para apagar os dados da chamada do Firestore após ela ser encerrada, evitando lixo no banco de dados.
+
+Para que tudo funcione, você também precisa atualizar as suas **Regras de Segurança do Firebase** para permitir a troca de informações da conexão WebRTC. Por favor, substitua suas regras atuais por estas:
+
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth.uid == userId;
+
+      match /calls/{callId} {
+        allow read, update, delete: if request.auth.uid == resource.data.callerId || request.auth.uid == resource.data.calleeId;
+        allow create: if request.auth.uid == request.resource.data.callerId;
+
+        // Permite a criação de "candidates" por ambos os usuários
+        match /{path=**}/candidates/{candidateId} {
+          allow create: if request.auth.uid == resource.data.callerId || request.auth.uid == resource.data.calleeId;
+        }
+      }
+    }
+    match /chats/{chatId}/{documents=**} {
+      allow read, write: if request.auth != null && request.auth.uid in chatId.split('_');
+    }
+  }
+}
+
