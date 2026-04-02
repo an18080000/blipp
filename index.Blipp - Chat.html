@@ -268,11 +268,25 @@
         .view-once-opened { opacity: 0.5; cursor: default; }
         .view-once-icon { width: 24px; height: 24px; border-radius: 50%; border: 2px dashed currentColor; display: flex; items-center; justify-center; font-size: 10px; font-weight: bold; }
         
-        /* Menu de Anexos WhatsApp Style */
-        .attachment-menu { position: absolute; bottom: 80px; left: 10px; display: none; flex-direction: column-reverse; gap: 10px; animation: slideUp 0.2s ease-out; z-index: 100; }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .attachment-item { width: 50px; height: 50px; border-radius: 50%; display: flex; items-center; justify-center; color: white; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: transform 0.2s; }
-        .attachment-item:hover { transform: scale(1.1); }
+        /* Menu de Anexos WhatsApp Style PRO */
+        .attachment-menu { 
+            position: absolute; bottom: 75px; left: 15px; 
+            display: none; flex-direction: column-reverse; gap: 12px; 
+            animation: slideUp 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            z-index: 100; padding: 10px;
+        }
+        @keyframes slideUp { from { transform: translateY(30px) scale(0.8); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+        .attachment-item { 
+            width: 52px; height: 52px; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; color: white; 
+            cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+            transition: all 0.2s ease;
+        }
+        .attachment-item:hover { transform: scale(1.15); filter: brightness(1.1); }
+        .attachment-item i { 
+            width: 22px; height: 22px; stroke-width: 2.5px; 
+            display: flex; align-items: center; justify-content: center;
+        }
     </style>
 
 <link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22index.Blipp%20-%20Chat.html%22%2C%22short_name%22%3A%22index.Blipp%20-%20Chat.html%22%2C%22display%22%3A%22standalone%22%2C%22start_url%22%3A%22.%22%2C%22background_color%22%3A%22%230f111a%22%2C%22theme_color%22%3A%22%233b82f6%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fapi.dicebear.com%2F7.x%2Fbottts%2Fsvg%3Fseed%3Dindex.Blipp%2520-%2520Chat.html%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%2C%7B%22src%22%3A%22https%3A%2F%2Fapi.dicebear.com%2F7.x%2Fbottts%2Fsvg%3Fseed%3Dindex.Blipp%2520-%2520Chat.html%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
@@ -650,10 +664,30 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
 
                     <!-- MENU DE ANEXOS (WHATSAPP CLONE) -->
                     <div id="attachment-menu" class="attachment-menu">
-                        <div onclick="triggerFileType('file')" class="attachment-item bg-[#7f66ff]" title="Documento"><i data-lucide="file-text"></i></div>
-                        <div onclick="triggerFileType('image')" class="attachment-item bg-[#d3396d]" title="Galeria"><i data-lucide="image"></i></div>
-                        <div onclick="triggerFileType('audio')" class="attachment-item bg-[#ff9208]" title="Áudio"><i data-lucide="music"></i></div>
-                        <div onclick="triggerFileType('camera')" class="attachment-item bg-[#ec407a]" title="Câmara"><i data-lucide="camera"></i></div>
+                        <!-- Contacto -->
+                        <div onclick="showBlippNotification('Blipp', 'Funcionalidade de contacto brevemente.', 'info')" class="attachment-item bg-[#0eabf4]" title="Contacto">
+                            <i data-lucide="user"></i>
+                        </div>
+                        <!-- Documento -->
+                        <div onclick="triggerFileType('file')" class="attachment-item bg-[#7f66ff]" title="Documento">
+                            <i data-lucide="file-text"></i>
+                        </div>
+                        <!-- Câmara -->
+                        <div onclick="triggerFileType('camera')" class="attachment-item bg-[#ec407a]" title="Câmara">
+                            <i data-lucide="camera"></i>
+                        </div>
+                        <!-- Galeria -->
+                        <div onclick="triggerFileType('image')" class="attachment-item bg-[#bf59cf]" title="Galeria">
+                            <i data-lucide="image"></i>
+                        </div>
+                        <!-- Áudio -->
+                        <div onclick="triggerFileType('audio')" class="attachment-item bg-[#ff9208]" title="Áudio">
+                            <i data-lucide="headphones"></i>
+                        </div>
+                        <!-- Localização -->
+                        <div onclick="showBlippNotification('GPS', 'Partilha de localização brevemente.', 'info')" class="attachment-item bg-[#06cf9c]" title="Localização">
+                            <i data-lucide="map-pin"></i>
+                        </div>
                     </div>
 
                     <form id="message-form" class="flex items-center gap-2 px-1 relative">
@@ -689,12 +723,12 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
                                 </div>
 
                                 <!-- Botão de Playback (Apenas no Review Mode) -->
-                                <button type="button" id="preview-play-btn" onclick="togglePreviewPlayback()" class="hidden p-2 text-wa-teal">
+                                <button type="button" id="preview-play-btn" onclick="window.togglePreviewPlayback()" class="hidden p-2 text-wa-teal active:scale-90 transition-transform">
                                     <i data-lucide="play" class="w-5 h-5 fill-current"></i>
                                 </button>
 
                                 <!-- Botão Parar Gravação (Manual) -->
-                                <button type="button" id="stop-record-btn" onclick="stopRecordingProcess(false)" class="p-2 text-red-500">
+                                <button type="button" id="stop-record-btn" onclick="window.stopRecordingProcess(false)" class="p-2 text-red-500 active:scale-90 transition-transform">
                                     <i data-lucide="pause" class="w-5 h-5 fill-current"></i>
                                 </button>
                             </div>
@@ -905,6 +939,52 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
         </div>
     </div>
 
+    <!-- CAMERA MODAL (BLIPP STUDIO) -->
+    <div id="camera-modal" class="hidden fixed inset-0 flex flex-col">
+        <!-- Preview em Tempo Real -->
+        <video id="camera-stream" class="absolute inset-0 w-full h-full object-cover" autoplay playsinline></video>
+        
+        <!-- Foto Capturada (Para Edição) -->
+        <canvas id="camera-canvas" class="hidden absolute inset-0 w-full h-full object-cover"></canvas>
+
+        <div class="camera-overlay">
+            <!-- Header: Fechar e Controles -->
+            <div class="flex justify-between items-center">
+                <button onclick="window.closeCamera()" class="p-2 text-white"><i data-lucide="x" class="w-8 h-8"></i></button>
+                <div id="camera-edit-tools" class="hidden flex gap-4">
+                    <button id="cam-view-once" onclick="window.toggleCameraViewOnce()" class="w-10 h-10 rounded-full border-2 border-white text-white flex items-center justify-center font-bold text-sm transition-colors">1</button>
+                </div>
+            </div>
+
+            <!-- Footer: Filtros e Shutter -->
+            <div class="flex flex-col gap-6 items-center">
+                <!-- Barra de Filtros (Apenas após capturar) -->
+                <div id="camera-filters" class="hidden w-full overflow-x-auto no-scrollbar flex gap-3 px-4 py-2">
+                    <button onclick="window.applyCamFilter('none')" class="filter-chip active">Original</button>
+                    <button onclick="window.applyCamFilter('grayscale(100%)')" class="filter-chip">P&B</button>
+                    <button onclick="window.applyCamFilter('sepia(100%)')" class="filter-chip">Sépia</button>
+                    <button onclick="window.applyCamFilter('brightness(150%)')" class="filter-chip">Brilho</button>
+                    <button onclick="window.applyCamFilter('contrast(200%)')" class="filter-chip">Contraste</button>
+                    <button onclick="window.applyCamFilter('invert(100%)')" class="filter-chip">Negativo</button>
+                </div>
+
+                <div class="flex items-center justify-between w-full max-w-xs mb-4">
+                    <button id="cam-cancel-photo" onclick="window.resetCamera()" class="hidden text-white flex flex-col items-center gap-1">
+                        <i data-lucide="refresh-cw"></i><span class="text-[10px]">Repetir</span>
+                    </button>
+                    
+                    <button id="shutter-btn" onclick="window.takePhoto()" class="shutter-btn">
+                        <div class="shutter-inner"></div>
+                    </button>
+
+                    <button id="cam-send-photo" onclick="window.sendCapturedPhoto()" class="hidden w-16 h-16 rounded-full bg-[#00a884] text-white flex items-center justify-center shadow-lg active:scale-95 transition-transform">
+                        <i data-lucide="send" class="w-8 h-8"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- AUTH OVERLAY -->
     <div id="auth-container" class="fixed inset-0 z-[1000] flex items-center justify-center bg-wa-bg dark:bg-wa-darkBg p-4">
         <div class="w-full max-w-md text-center">
@@ -979,6 +1059,7 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
         const saveSettings = (s) => localStorage.setItem('blipp_settings', JSON.stringify(s));
         let mediaRecorder = null, audioChunks = [], recordTimer = null, secondsElapsed = 0;
         let selectedFile = null, isViewOnce = false;
+        let cameraStreamObj = null, camCapturedBlob = null, camFilter = 'none', camViewOnce = false;
         let sidebarUnsub = null;
 
         lucide.createIcons();
@@ -996,7 +1077,8 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
         let startY = 0;
         let recordCancelled = false;
         let recordedAudioBlob = null; 
-        let previewAudioObj = null; // Objeto de áudio para prévia
+        let previewAudioObj = null; 
+        let isReviewMode = false; // Novo estado de controlo
 
         // Alternar Ícone por Input de Texto
         messageInput.addEventListener('input', () => {
@@ -1022,15 +1104,17 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
         const startAction = (e) => {
             const hasText = messageInput.value.trim().length > 0 || selectedFile !== null;
             
-            // Se houver um áudio pronto para enviar (Review mode)
-            if (recordedAudioBlob) {
-                sendRecordedAudio();
+            // Se estiver em modo de revisão, o botão principal apenas envia o buffer guardado
+            if (isReviewMode && recordedAudioBlob) {
+                window.sendRecordedAudio();
                 return;
             }
 
             if (hasText) {
                 document.getElementById('message-form').dispatchEvent(new Event('submit'));
             } else {
+                // Prevenir gravação se já houver texto ou se já estiver a gravar (multi-click)
+                if (isRecording) return;
                 startY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
                 startRecordingProcess();
             }
@@ -1100,11 +1184,10 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
             isLocked = true;
             lockUI.innerHTML = '<i data-lucide="lock" class="text-wa-teal w-5 h-5"></i>';
             lucide.createIcons();
-            showBlippNotification("Voz", "Gravação bloqueada. Toque no botão para enviar.", "info");
-            mainActionBtn.onclick = () => stopRecordingProcess(false);
+            showBlippNotification("Voz", "Cadeado ativado. Pare a gravação para revisar.", "info");
         }
 
-        function stopRecordingProcess(cancelled = false) {
+        window.stopRecordingProcess = (cancelled = false) => {
             if (!isRecording) return;
             recordCancelled = cancelled;
             
@@ -1117,29 +1200,30 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
             isLocked = false;
             stopTimer();
 
-            // Reset UI temporário (enterReviewMode cuidará do resto)
             if (cancelled) {
                 resetInputUI();
             }
-        }
+        };
 
         function enterReviewMode() {
-            // UI Transition
+            isReviewMode = true;
+            // UI Transition: O botão principal torna-se o botão de ENVIO FINAL
             mainActionBtn.classList.remove('recording');
             mainActionBtn.classList.add('bg-[#00a884]');
             iconMic.classList.add('hidden');
             iconSend.classList.remove('hidden');
             
-            // Esconder botão de STOP e mostrar botão de PLAY da prévia
+            // Esconder o botão de pausa/stop e mostrar o botão de reproduzir a prévia
             document.getElementById('stop-record-btn').classList.add('hidden');
             document.getElementById('preview-play-btn').classList.remove('hidden');
             
-            // Alterar info da gravação
+            // UI Visual: Parar animações de gravação ativa
             document.getElementById('recording-dot').classList.add('hidden');
             document.getElementById('recording-timer').classList.add('text-wa-teal');
+            document.getElementById('waveform').classList.replace('opacity-40', 'opacity-100');
             
             lucide.createIcons();
-            showBlippNotification("Áudio", "Prévia disponível. Pode ouvir antes de enviar.", "info");
+            showBlippNotification("Blipp Áudio", "Ouvir prévia ou enviar.", "info");
         }
 
         window.togglePreviewPlayback = () => {
@@ -1165,14 +1249,12 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
             lucide.createIcons();
         }
 
-        async function sendRecordedAudio() {
+        window.sendRecordedAudio = async () => {
             if (!recordedAudioBlob || !activeChatId) return;
 
             const audioFile = new File([recordedAudioBlob], `audio_${Date.now()}.webm`, { type: 'audio/webm' });
-            recordedAudioBlob = null; // Limpar buffer
             
-            resetInputUI();
-            showBlippNotification("Cloud R2", "A enviar áudio...", "info");
+            showBlippNotification("Cloud R2", "A processar áudio...", "info");
             
             try {
                 const url = await window.uploadFileToR2(audioFile, 'audios');
@@ -1180,10 +1262,11 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
                     senderId: currentUser.uid,
                     text: '', mediaUrl: url, mediaType: 'audio', timestamp: serverTimestamp()
                 });
+                resetInputUI();
             } catch (err) {
                 showBlippNotification("Erro R2", "Falha ao enviar áudio.", "error");
             }
-        }
+        };
 
         function resetInputUI() {
             if (previewAudioObj) {
@@ -1194,18 +1277,24 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
             recordCancelled = false;
             isRecording = false;
             isLocked = false;
+            isReviewMode = false;
             
             mainActionBtn.classList.remove('recording');
+            mainActionBtn.classList.remove('bg-[#00a884]'); // Remove cor se estava em review
+            
             document.getElementById('recording-status').classList.add('hidden');
             document.getElementById('stop-record-btn').classList.remove('hidden');
             document.getElementById('preview-play-btn').classList.add('hidden');
             document.getElementById('recording-dot').classList.remove('hidden');
             document.getElementById('recording-timer').classList.remove('text-wa-teal');
+            document.getElementById('waveform').classList.add('opacity-40');
+            document.getElementById('waveform').classList.remove('opacity-100');
             
             document.getElementById('input-capsule').classList.remove('bg-red-50/50', 'dark:bg-red-900/10');
             messageInput.classList.remove('hidden');
             messageInput.value = '';
             
+            // Voltar ao ícone de microfone (estado inicial)
             iconMic.classList.remove('hidden', 'recording-pulse');
             iconSend.classList.add('hidden');
             
@@ -1215,15 +1304,7 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
             lucide.createIcons();
         }
 
-        // Função global para o botão da lixeira
-        window.cancelRecording = () => {
-            recordCancelled = true;
-            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-                mediaRecorder.stop();
-            }
-            resetInputUI();
-            showBlippNotification("Blipp", "Gravação descartada.", "info");
-        };
+        // (Removido duplicado - a lógica consolidada está acima na seção de Hardware)
 
         // LÓGICA DE FICHEIROS (PAPERCLIP)
         window.toggleAttachmentMenu = (e) => {
@@ -1237,12 +1318,132 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
         };
 
         window.triggerFileType = (type) => {
+            if(type === 'camera') {
+                window.openCamera();
+                return;
+            }
             const input = document.getElementById('universal-file-input');
             input.setAttribute('accept', '');
             if(type === 'image') input.setAttribute('accept', 'image/*,video/*');
             else if(type === 'audio') input.setAttribute('accept', 'audio/*');
-            else if(type === 'camera') input.setAttribute('accept', 'image/*'); // Mobile aciona câmara
             input.click();
+        };
+
+        // BLIPP CAMERA STUDIO LOGIC
+        window.openCamera = async () => {
+            const modal = document.getElementById('camera-modal');
+            const video = document.getElementById('camera-stream');
+            
+            try {
+                cameraStreamObj = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } }, 
+                    audio: false 
+                });
+                video.srcObject = cameraStreamObj;
+                modal.classList.remove('hidden');
+                window.resetCamera();
+                lucide.createIcons();
+            } catch (err) {
+                showBlippNotification("Erro Câmara", "Não foi possível aceder à câmara.", "error");
+            }
+        };
+
+        window.takePhoto = () => {
+            const video = document.getElementById('camera-stream');
+            const canvas = document.getElementById('camera-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.filter = camFilter;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // UI Transition
+            video.classList.add('hidden');
+            canvas.classList.remove('hidden');
+            document.getElementById('camera-filters').classList.remove('hidden');
+            document.getElementById('camera-edit-tools').classList.remove('hidden');
+            document.getElementById('shutter-btn').classList.add('hidden');
+            document.getElementById('cam-cancel-photo').classList.remove('hidden');
+            document.getElementById('cam-send-photo').classList.remove('hidden');
+            
+            lucide.createIcons();
+        };
+
+        window.applyCamFilter = (filter) => {
+            camFilter = filter;
+            const canvas = document.getElementById('camera-canvas');
+            const video = document.getElementById('camera-stream');
+            const ctx = canvas.getContext('2d');
+            
+            // Redesenhar com filtro
+            ctx.filter = filter;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Atualizar chips
+            document.querySelectorAll('.filter-chip').forEach(c => {
+                c.classList.toggle('active', c.innerText.toLowerCase().includes(filter === 'none' ? 'original' : ''));
+            });
+        };
+
+        window.toggleCameraViewOnce = () => {
+            camViewOnce = !camViewOnce;
+            const btn = document.getElementById('cam-view-once');
+            btn.classList.toggle('bg-wa-teal', camViewOnce);
+            btn.classList.toggle('border-wa-teal', camViewOnce);
+            showBlippNotification("Modo", camViewOnce ? "Visualização única ativada." : "Visualização única desativada.", "info");
+        };
+
+        window.resetCamera = () => {
+            const video = document.getElementById('camera-stream');
+            const canvas = document.getElementById('camera-canvas');
+            
+            video.classList.remove('hidden');
+            canvas.classList.add('hidden');
+            document.getElementById('camera-filters').classList.add('hidden');
+            document.getElementById('camera-edit-tools').classList.add('hidden');
+            document.getElementById('shutter-btn').classList.remove('hidden');
+            document.getElementById('cam-cancel-photo').classList.add('hidden');
+            document.getElementById('cam-send-photo').classList.add('hidden');
+            
+            camFilter = 'none';
+            camViewOnce = false;
+            document.getElementById('cam-view-once').classList.remove('bg-wa-teal', 'border-wa-teal');
+        };
+
+        window.closeCamera = () => {
+            if (cameraStreamObj) {
+                cameraStreamObj.getTracks().forEach(t => t.stop());
+                cameraStreamObj = null;
+            }
+            document.getElementById('camera-modal').classList.add('hidden');
+        };
+
+        window.sendCapturedPhoto = async () => {
+            const canvas = document.getElementById('camera-canvas');
+            canvas.toBlob(async (blob) => {
+                const file = new File([blob], `blipp_capture_${Date.now()}.jpg`, { type: 'image/jpeg' });
+                const viewOnce = camViewOnce;
+                
+                window.closeCamera();
+                showBlippNotification("Blipp Studio", "A processar foto...", "info");
+                
+                try {
+                    const url = await window.uploadFileToR2(file, 'images');
+                    await addDoc(collection(db, 'chats', activeChatId, 'messages'), {
+                        senderId: currentUser.uid,
+                        text: "",
+                        mediaUrl: url,
+                        mediaType: 'image',
+                        fileName: file.name,
+                        isViewOnce: viewOnce,
+                        viewers: [],
+                        timestamp: serverTimestamp()
+                    });
+                } catch (err) {
+                    showBlippNotification("Erro R2", "Falha ao enviar foto.", "error");
+                }
+            }, 'image/jpeg', 0.9);
         };
 
         window.toggleViewOnce = () => {
@@ -1307,8 +1508,17 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
             };
         };
 
-        // Função auxiliar para cancelar gravação (ex: via botão X que pode ser adicionado)
-        window.cancelRecording = () => stopRecordingProcess(true);
+        // LÓGICA DE CANCELAMENTO / EXCLUSÃO (BOTÃO LIXEIRA)
+        window.cancelRecording = () => {
+            // Se estiver a gravar, cancelamos o processo de gravação
+            if (isRecording) {
+                window.stopRecordingProcess(true);
+            } else if (isReviewMode) {
+                // Se estiver apenas a revisar, resetamos a UI e limpamos o buffer
+                resetInputUI();
+            }
+            showBlippNotification("Blipp Áudio", "Gravação eliminada com sucesso.", "info");
+        };
 
         function startTimer() {
             secondsElapsed = 0;
