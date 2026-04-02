@@ -671,10 +671,32 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
                             
                             <input id="message-input" type="text" placeholder="Mensagem" class="flex-1 py-3 px-1 bg-transparent dark:text-white outline-none text-[16px] placeholder-[#8696a0]">
                             
-                            <div id="recording-status" class="hidden px-3 flex items-center gap-2 text-red-500 flex-1">
-                                <span class="recording-pulse w-2 h-2 bg-red-500 rounded-full"></span>
-                                <span id="recording-timer" class="text-[15px] font-medium text-gray-700 dark:text-white">00:00</span>
-                                <span class="text-xs text-gray-400 animate-pulse ml-auto pr-4">Deslize para cancelar</span>
+                            <div id="recording-status" class="hidden px-2 flex items-center gap-3 flex-1 overflow-hidden">
+                                <!-- Botão Lixeira (Cancelar) -->
+                                <button type="button" onclick="cancelRecording()" class="p-2 text-[#8696a0] hover:text-red-500 transition-colors">
+                                    <i data-lucide="trash-2" class="w-5 h-5"></i>
+                                </button>
+                                
+                                <!-- Cronómetro / Status -->
+                                <div id="recording-info" class="flex items-center gap-2 min-w-[60px]">
+                                    <span id="recording-dot" class="recording-pulse w-2.5 h-2.5 bg-red-500 rounded-full"></span>
+                                    <span id="recording-timer" class="text-[15px] font-medium text-gray-700 dark:text-white">0:00</span>
+                                </div>
+
+                                <!-- Visualizador de Onda Estático -->
+                                <div id="waveform" class="flex-1 flex items-center justify-center gap-[2px] opacity-40">
+                                    <div class="waveform-bar" style="height: 12px"></div><div class="waveform-bar" style="height: 18px"></div><div class="waveform-bar" style="height: 10px"></div><div class="waveform-bar" style="height: 22px"></div><div class="waveform-bar" style="height: 14px"></div><div class="waveform-bar" style="height: 20px"></div><div class="waveform-bar" style="height: 12px"></div><div class="waveform-bar" style="height: 18px"></div><div class="waveform-bar" style="height: 10px"></div><div class="waveform-bar" style="height: 16px"></div><div class="waveform-bar" style="height: 14px"></div>
+                                </div>
+
+                                <!-- Botão de Playback (Apenas no Review Mode) -->
+                                <button type="button" id="preview-play-btn" onclick="togglePreviewPlayback()" class="hidden p-2 text-wa-teal">
+                                    <i data-lucide="play" class="w-5 h-5 fill-current"></i>
+                                </button>
+
+                                <!-- Botão Parar Gravação (Manual) -->
+                                <button type="button" id="stop-record-btn" onclick="stopRecordingProcess(false)" class="p-2 text-red-500">
+                                    <i data-lucide="pause" class="w-5 h-5 fill-current"></i>
+                                </button>
                             </div>
 
                             <button type="button" onclick="toggleAttachmentMenu(event)" class="p-2 text-[#8696a0] -rotate-45 hover:text-[#54656f] transition-colors"><i data-lucide="paperclip" class="w-6 h-6"></i></button>
@@ -973,6 +995,8 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
         let isLocked = false;
         let startY = 0;
         let recordCancelled = false;
+        let recordedAudioBlob = null; 
+        let previewAudioObj = null; // Objeto de áudio para prévia
 
         // Alternar Ícone por Input de Texto
         messageInput.addEventListener('input', () => {
@@ -997,6 +1021,13 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
         // GESTÃO DE EVENTOS (MOUSE E TOUCH)
         const startAction = (e) => {
             const hasText = messageInput.value.trim().length > 0 || selectedFile !== null;
+            
+            // Se houver um áudio pronto para enviar (Review mode)
+            if (recordedAudioBlob) {
+                sendRecordedAudio();
+                return;
+            }
+
             if (hasText) {
                 document.getElementById('message-form').dispatchEvent(new Event('submit'));
             } else {
@@ -1041,17 +1072,14 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
                 mediaRecorder = new MediaRecorder(stream);
                 audioChunks = [];
                 recordCancelled = false;
+                recordedAudioBlob = null;
 
                 mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
                 mediaRecorder.onstop = async () => {
                     if (recordCancelled) return;
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                    const audioFile = new File([audioBlob], `audio_${Date.now()}.webm`, { type: 'audio/webm' });
-                    const url = await window.uploadFileToR2(audioFile, 'audios');
-                    await addDoc(collection(db, 'chats', activeChatId, 'messages'), {
-                        senderId: currentUser.uid,
-                        text: '', mediaUrl: url, mediaType: 'audio', timestamp: serverTimestamp()
-                    });
+                    // Em vez de enviar, guardamos no buffer para revisão
+                    recordedAudioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    enterReviewMode();
                 };
 
                 mediaRecorder.start();
@@ -1089,17 +1117,113 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
             isLocked = false;
             stopTimer();
 
-            // Reset UI
+            // Reset UI temporário (enterReviewMode cuidará do resto)
+            if (cancelled) {
+                resetInputUI();
+            }
+        }
+
+        function enterReviewMode() {
+            // UI Transition
             mainActionBtn.classList.remove('recording');
-            mainActionBtn.onclick = null;
-            document.getElementById('recording-status').classList.add('hidden');
-            document.getElementById('input-capsule').classList.remove('bg-red-50/50', 'dark:bg-red-900/10');
-            messageInput.classList.remove('hidden');
-            iconMic.classList.remove('recording-pulse');
-            lockUI.style.display = 'none';
-            lockUI.innerHTML = '<i data-lucide="lock" class="w-4 h-4 text-gray-400"></i><div class="w-1 h-8 bg-gray-100 dark:bg-gray-800 rounded-full relative overflow-hidden"><div id="lock-progress" class="absolute bottom-0 left-0 right-0 bg-wa-teal transition-all" style="height: 0%"></div></div>';
+            mainActionBtn.classList.add('bg-[#00a884]');
+            iconMic.classList.add('hidden');
+            iconSend.classList.remove('hidden');
+            
+            // Esconder botão de STOP e mostrar botão de PLAY da prévia
+            document.getElementById('stop-record-btn').classList.add('hidden');
+            document.getElementById('preview-play-btn').classList.remove('hidden');
+            
+            // Alterar info da gravação
+            document.getElementById('recording-dot').classList.add('hidden');
+            document.getElementById('recording-timer').classList.add('text-wa-teal');
+            
+            lucide.createIcons();
+            showBlippNotification("Áudio", "Prévia disponível. Pode ouvir antes de enviar.", "info");
+        }
+
+        window.togglePreviewPlayback = () => {
+            if (!recordedAudioBlob) return;
+            
+            if (previewAudioObj && !previewAudioObj.paused) {
+                previewAudioObj.pause();
+                updatePreviewBtnIcon(false);
+            } else {
+                if (!previewAudioObj) {
+                    const url = URL.createObjectURL(recordedAudioBlob);
+                    previewAudioObj = new Audio(url);
+                    previewAudioObj.onended = () => updatePreviewBtnIcon(false);
+                }
+                previewAudioObj.play();
+                updatePreviewBtnIcon(true);
+            }
+        };
+
+        function updatePreviewBtnIcon(isPlaying) {
+            const btn = document.getElementById('preview-play-btn');
+            btn.innerHTML = `<i data-lucide="${isPlaying ? 'pause' : 'play'}" class="w-5 h-5 fill-current"></i>`;
             lucide.createIcons();
         }
+
+        async function sendRecordedAudio() {
+            if (!recordedAudioBlob || !activeChatId) return;
+
+            const audioFile = new File([recordedAudioBlob], `audio_${Date.now()}.webm`, { type: 'audio/webm' });
+            recordedAudioBlob = null; // Limpar buffer
+            
+            resetInputUI();
+            showBlippNotification("Cloud R2", "A enviar áudio...", "info");
+            
+            try {
+                const url = await window.uploadFileToR2(audioFile, 'audios');
+                await addDoc(collection(db, 'chats', activeChatId, 'messages'), {
+                    senderId: currentUser.uid,
+                    text: '', mediaUrl: url, mediaType: 'audio', timestamp: serverTimestamp()
+                });
+            } catch (err) {
+                showBlippNotification("Erro R2", "Falha ao enviar áudio.", "error");
+            }
+        }
+
+        function resetInputUI() {
+            if (previewAudioObj) {
+                previewAudioObj.pause();
+                previewAudioObj = null;
+            }
+            recordedAudioBlob = null;
+            recordCancelled = false;
+            isRecording = false;
+            isLocked = false;
+            
+            mainActionBtn.classList.remove('recording');
+            document.getElementById('recording-status').classList.add('hidden');
+            document.getElementById('stop-record-btn').classList.remove('hidden');
+            document.getElementById('preview-play-btn').classList.add('hidden');
+            document.getElementById('recording-dot').classList.remove('hidden');
+            document.getElementById('recording-timer').classList.remove('text-wa-teal');
+            
+            document.getElementById('input-capsule').classList.remove('bg-red-50/50', 'dark:bg-red-900/10');
+            messageInput.classList.remove('hidden');
+            messageInput.value = '';
+            
+            iconMic.classList.remove('hidden', 'recording-pulse');
+            iconSend.classList.add('hidden');
+            
+            lockUI.style.display = 'none';
+            lockUI.innerHTML = '<i data-lucide="lock" class="w-4 h-4 text-gray-400"></i><div class="w-1 h-8 bg-gray-100 dark:bg-gray-800 rounded-full relative overflow-hidden"><div id="lock-progress" class="absolute bottom-0 left-0 right-0 bg-wa-teal transition-all" style="height: 0%"></div></div>';
+            
+            lucide.createIcons();
+        }
+
+        // Função global para o botão da lixeira
+        window.cancelRecording = () => {
+            recordCancelled = true;
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+            }
+            resetInputUI();
+            showBlippNotification("Blipp", "Gravação descartada.", "info");
+        };
 
         // LÓGICA DE FICHEIROS (PAPERCLIP)
         window.toggleAttachmentMenu = (e) => {
