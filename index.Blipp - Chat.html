@@ -6,7 +6,7 @@
     <title>Blipp - WhatsApp Web G2 PRO</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@1/index.js"></script>
@@ -254,8 +254,40 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <script>
-let dP;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dP=e;const b=document.createElement('button');b.innerHTML='<svg style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;margin-right:6px" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Instalar App';b.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:99999;background:#3b82f6;color:#fff;border:none;padding:12px 24px;border-radius:50px;font-family:sans-serif;font-weight:600;font-size:14px;box-shadow:0 4px 20px rgba(59,130,246,0.4);cursor:pointer;display:flex;align-items:center;white-space:nowrap;transition:transform 0.2s;';b.onclick=async()=>{if(!dP)return;dP.prompt();const{outcome}=await dP.userChoice;if(outcome==='accepted')b.remove();dP=null;};document.body.appendChild(b);});
-const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());const isStandalone=()=>('standalone' in window.navigator)&&window.navigator.standalone;if(isIos()&&!isStandalone()){const ib=document.createElement('div');ib.innerHTML='Para instalar como App: toque em <b>Compartilhar</b> e depois <b>Adicionar ao Ecrã Principal</b><button style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#a1a1aa;font-size:16px;" onclick="this.parentElement.remove()">✕</button>';ib.style.cssText='position:fixed;bottom:0;left:0;width:100%;background:#1c1e2b;color:#fff;padding:15px 30px 15px 15px;font-family:sans-serif;font-size:12px;text-align:center;z-index:99999;border-top:1px solid #2b2d3a;box-shadow:0 -5px 15px rgba(0,0,0,0.2);';setTimeout(()=>document.body.appendChild(ib),2000);}
+let dP;
+window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    dP = e;
+    // Criamos o botão flutuante apenas se não estiver em standalone
+    if(!window.matchMedia('(display-mode: standalone)').matches) {
+        const b = document.createElement('button');
+        b.id = "pwa-floating-install";
+        b.innerHTML = '<svg style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;margin-right:6px" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Instalar App';
+        b.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:99999;background:#00a884;color:#fff;border:none;padding:12px 24px;border-radius:50px;font-family:sans-serif;font-weight:600;font-size:14px;box-shadow:0 4px 20px rgba(0,168,132,0.4);cursor:pointer;display:flex;align-items:center;white-space:nowrap;transition:transform 0.2s;';
+        b.onclick = () => window.installBlippApp();
+        document.body.appendChild(b);
+    }
+});
+
+window.installBlippApp = async () => {
+    if (!dP) {
+        if(window.matchMedia('(display-mode: standalone)').matches) {
+            alert("O Blipp já está instalado como aplicação.");
+        } else {
+            alert("A instalação não é suportada neste navegador ou já foi solicitada. Tente usar o Chrome ou Edge.");
+        }
+        return;
+    }
+    dP.prompt();
+    const { outcome } = await dP.userChoice;
+    if (outcome === 'accepted') {
+        const b = document.getElementById('pwa-floating-install');
+        if(b) b.remove();
+    }
+    dP = null;
+};
+
+const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());const isStandalone=()=>('standalone' in window.navigator)||window.matchMedia('(display-mode: standalone)').matches;if(isIos()&&!isStandalone()){const ib=document.createElement('div');ib.innerHTML='Para instalar como App: toque em <b>Compartilhar</b> e depois <b>Adicionar ao Ecrã Principal</b><button style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#a1a1aa;font-size:16px;" onclick="this.parentElement.remove()">✕</button>';ib.style.cssText='position:fixed;bottom:0;left:0;width:100%;background:#1c1e2b;color:#fff;padding:15px 30px 15px 15px;font-family:sans-serif;font-size:12px;text-align:center;z-index:99999;border-top:1px solid #2b2d3a;box-shadow:0 -5px 15px rgba(0,0,0,0.2);';setTimeout(()=>document.body.appendChild(ib),2000);}
 </script>
 </head>
 <body class="flex items-center justify-center p-0">
@@ -1008,15 +1040,26 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
             clearInterval(recordTimer);
         }
 
-        // AUTH & SYNC
+        // AUTH & SYNC (OTIMIZADO PARA PERSISTÊNCIA)
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
                 document.getElementById('auth-container').classList.add('hidden');
-                await syncUser(user);
+                
+                // Primeiro sincronizamos/recuperamos dados do Firestore
+                const userData = await syncUser(user);
+                
+                // Atualizar UI Global com os dados persistentes (Firestore tem prioridade sobre Auth)
+                const finalName = userData.displayName || user.displayName || "Utilizador";
+                const finalPhoto = userData.photoURL || user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(finalName)}&background=00a884&color=fff`;
+                
+                document.getElementById('my-avatar').src = finalPhoto;
+                document.getElementById('qr-my-avatar').src = finalPhoto;
+                document.getElementById('qr-my-name').textContent = finalName;
+                
                 switchTab('chats');
                 startGlobalNotificationListener();
-                startIncomingCallListener(); // Monitorizar chamadas em tempo real
+                startIncomingCallListener();
             } else {
                 document.getElementById('auth-container').classList.remove('hidden');
             }
@@ -1193,13 +1236,24 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
 
         async function syncUser(user) {
             const ref = doc(db, "users", user.uid);
-            await setDoc(ref, { 
-                uid: user.uid, 
-                email: user.email, 
-                displayName: user.displayName || user.email.split('@')[0],
-                photoURL: user.photoURL || `https://ui-avatars.com/api/?name=${user.email}`
-            }, { merge: true });
-            document.getElementById('my-avatar').src = user.photoURL || `https://ui-avatars.com/api/?name=${user.email}`;
+            const snap = await getDoc(ref);
+            
+            let data = {
+                uid: user.uid,
+                email: user.email,
+                lastSeen: serverTimestamp()
+            };
+
+            // Se o utilizador já existe, não sobrepomos com dados nulos do Auth
+            if (!snap.exists()) {
+                data.displayName = user.displayName || user.email.split('@')[0];
+                data.photoURL = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.displayName)}&background=00a884&color=fff`;
+                await setDoc(ref, data);
+                return data;
+            } else {
+                await updateDoc(ref, { lastSeen: serverTimestamp() });
+                return snap.data();
+            }
         }
 
         // TABS NAVIGATION
@@ -1267,6 +1321,22 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
                                     <button onclick="toggleDarkMode()" class="w-10 h-10 bg-wa-bg dark:bg-wa-darkBg rounded-full flex items-center justify-center dark:text-white">
                                         <i data-lucide="moon"></i>
                                     </button>
+                                </div>
+                            </div>
+
+                            <!-- INSTALAR COMO APP -->
+                            <div class="bg-white dark:bg-wa-darkHeader rounded-xl shadow-sm overflow-hidden">
+                                <div class="p-4 flex justify-between items-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" onclick="installBlippApp()">
+                                    <div class="flex items-center gap-3">
+                                        <div class="p-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-lg">
+                                            <i data-lucide="download-cloud"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-bold dark:text-white">Instalar Aplicação</p>
+                                            <p class="text-xs text-gray-500">Usar o Blipp como App nativa</p>
+                                        </div>
+                                    </div>
+                                    <i data-lucide="chevron-right" class="text-gray-400"></i>
                                 </div>
                             </div>
 
@@ -2127,9 +2197,17 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
                 try {
                     const url = await window.uploadFileToR2(file, type + 's');
                     if(type === 'avatar') {
+                        // 1. Atualizar UI imediata
                         document.getElementById('p-avatar').src = url;
                         document.getElementById('my-avatar').src = url;
+                        document.getElementById('qr-my-avatar').src = url;
+                        
+                        // 2. Persistir no Firestore
                         await updateDoc(doc(db, "users", currentUser.uid), { photoURL: url });
+                        
+                        // 3. Persistir no Firebase Auth Profile
+                        await updateProfile(auth.currentUser, { photoURL: url });
+                        
                     } else if(type === 'cover') {
                         document.getElementById('p-cover').style.backgroundImage = `url(${url})`;
                         await updateDoc(doc(db, "users", currentUser.uid), { coverURL: url });
@@ -2171,14 +2249,32 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
         };
 
         window.saveFullProfile = async () => {
-            const name = document.getElementById('p-name').value;
-            const status = document.getElementById('p-status').value;
-            await updateDoc(doc(db, "users", currentUser.uid), { 
-                displayName: name,
-                status: status
-            });
-            showBlippNotification("Perfil", "Dados atualizados!", "success");
-            closeProfileModal();
+            const name = document.getElementById('p-name').value.trim();
+            const status = document.getElementById('p-status').value.trim();
+            
+            if (!name) return showBlippNotification("Erro", "O nome não pode estar vazio.", "error");
+
+            showBlippNotification("Perfil", "A guardar alterações...", "info");
+            
+            try {
+                // 1. Atualizar Firestore
+                await updateDoc(doc(db, "users", currentUser.uid), { 
+                    displayName: name,
+                    status: status
+                });
+
+                // 2. Atualizar Firebase Auth (Evita que o nome volte a ser null no reload)
+                await updateProfile(auth.currentUser, { displayName: name });
+
+                // 3. Atualizar UI Global
+                document.getElementById('qr-my-name').textContent = name;
+                
+                showBlippNotification("Perfil", "Dados atualizados com sucesso!", "success");
+                closeProfileModal();
+                renderSidebarContent(); // Atualiza o mini-perfil nas definições
+            } catch (err) {
+                showBlippNotification("Erro", "Falha ao guardar perfil.", "error");
+            }
         };
 
         // LÓGICA DE PESQUISA NO CHAT
