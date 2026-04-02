@@ -788,6 +788,8 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        window.auth = auth;
+        window.db = db;
 
         let currentUser = null, activeChatUser = null, activeChatId = null, unsubMessages = null, currentTab = 'chats';
         let localStream = null, pc = null, isMicMuted = false, isVideoOff = false, isSpeakerOff = false;
@@ -963,6 +965,8 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
                         if (change.doc.data().status === "ended") endCallUI();
                     }
                 });
+            }, (error) => {
+                console.warn("Call Listener Permission Warning:", error);
             });
         }
 
@@ -1330,6 +1334,9 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
                         container.appendChild(item);
                     });
                     lucide.createIcons();
+                }, (error) => {
+                    console.error("Sidebar Chats Permission Error:", error);
+                    container.innerHTML = '<div class="p-10 text-center text-red-500 text-sm">Erro de permissão ao carregar conversas.</div>';
                 });
             } else if (currentTab === 'status') {
                 container.innerHTML = `
@@ -1792,6 +1799,9 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
                 lucide.createIcons();
                 const container = document.getElementById('message-container');
                 container.scrollTop = container.scrollHeight;
+            }, (error) => {
+                console.error("Messages Permission Error:", error);
+                showBlippNotification("Erro", "Sem permissão para ler mensagens.", "error");
             });
         }
 
@@ -1921,6 +1931,8 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
                         }
                     }
                 });
+            }, (error) => {
+                console.warn("Global Notif Permission Warning:", error);
             });
         }
 
