@@ -939,57 +939,85 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
         </div>
     </div>
 
-    <!-- CAMERA MODAL (BLIPP STUDIO) - OVERLAY SUPREMO -->
+    <!-- CAMERA MODAL (BLIPP STUDIO) - WHATSAPP PIXEL-PERFECT -->
     <div id="camera-modal" class="hidden fixed inset-0 z-[5000] bg-black flex flex-col items-center justify-center">
         <!-- Preview em Tempo Real -->
         <video id="camera-stream" class="absolute inset-0 w-full h-full object-cover" autoplay playsinline muted></video>
         
-        <!-- Foto Capturada ou Vídeo Gravado (Para Edição/Preview) -->
+        <!-- Foto Capturada ou Vídeo Gravado (Preview) -->
         <canvas id="camera-canvas" class="hidden absolute inset-0 w-full h-full object-cover"></canvas>
         <video id="video-review" class="hidden absolute inset-0 w-full h-full object-cover" controls playsinline loop></video>
 
         <div class="camera-overlay">
-            <!-- Header: Fechar e Controles -->
-            <div class="flex justify-between items-center w-full">
-                <button onclick="window.closeCamera()" class="p-2 text-white bg-black/20 rounded-full"><i data-lucide="x" class="w-8 h-8"></i></button>
-                <div id="camera-edit-tools" class="hidden flex gap-4">
-                    <button id="cam-view-once" onclick="window.toggleCameraViewOnce()" class="w-10 h-10 rounded-full border-2 border-white text-white flex items-center justify-center font-bold text-sm transition-colors">1</button>
+            <!-- Camada Superior (Controles) -->
+            <div class="p-6 flex justify-between items-center w-full bg-gradient-to-b from-black/50 to-transparent">
+                <button onclick="window.closeCamera()" class="text-white drop-shadow-md"><i data-lucide="x" class="w-7 h-7"></i></button>
+                <div class="flex gap-6 items-center">
+                    <button id="cam-flash-toggle" class="text-white"><i data-lucide="zap-off" class="w-6 h-6"></i></button>
+                    <div id="camera-edit-tools" class="hidden flex gap-4">
+                        <button id="cam-view-once" onclick="window.toggleCameraViewOnce()" class="w-9 h-9 rounded-full border-2 border-white text-white flex items-center justify-center font-bold text-xs">1</button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Footer: Modos, Filtros e Shutter -->
-            <div class="flex flex-col gap-6 items-center w-full">
-                <!-- Seletor de Modo (Foto / Vídeo) -->
-                <div id="cam-mode-selector" class="flex gap-4 mb-2">
-                    <button onclick="window.setCamMode('photo')" id="mode-photo" class="cam-mode-btn active">FOTO</button>
-                    <button onclick="window.setCamMode('video')" id="mode-video" class="cam-mode-btn">VÍDEO</button>
+            <!-- Camada Inferior (Galeria, Shutter, Modos) -->
+            <div class="cam-bottom-nav flex flex-col items-center w-full mt-auto">
+                
+                <!-- Thumbnails Recentes (Simulados conforme Imagem) -->
+                <div id="cam-recent-bar" class="w-full flex gap-1.5 px-2 mb-6 overflow-x-auto no-scrollbar">
+                    <img src="https://picsum.photos/seed/wa1/100/100" class="recent-thumb">
+                    <img src="https://picsum.photos/seed/wa2/100/100" class="recent-thumb">
+                    <img src="https://picsum.photos/seed/wa3/100/100" class="recent-thumb">
+                    <img src="https://picsum.photos/seed/wa4/100/100" class="recent-thumb">
+                    <img src="https://picsum.photos/seed/wa5/100/100" class="recent-thumb">
+                    <img src="https://picsum.photos/seed/wa6/100/100" class="recent-thumb">
                 </div>
 
-                <!-- Barra de Filtros (Apenas para Fotos) -->
-                <div id="camera-filters" class="hidden w-full overflow-x-auto no-scrollbar flex gap-3 px-4 py-2">
-                    <button onclick="window.applyCamFilter('none')" class="filter-chip active">Original</button>
-                    <button onclick="window.applyCamFilter('grayscale(100%)')" class="filter-chip">P&B</button>
-                    <button onclick="window.applyCamFilter('sepia(100%)')" class="filter-chip">Sépia</button>
-                    <button onclick="window.applyCamFilter('brightness(150%)')" class="filter-chip">Brilho</button>
-                    <button onclick="window.applyCamFilter('contrast(200%)')" class="filter-chip">Contraste</button>
-                </div>
-
-                <div class="flex items-center justify-between w-full max-w-[320px] mb-8">
-                    <button id="cam-cancel-media" onclick="window.resetCamera()" class="hidden text-white bg-black/40 p-3 rounded-full flex flex-col items-center gap-1 transition-all">
-                        <i data-lucide="refresh-cw" class="w-6 h-6"></i>
+                <!-- Controlos de Disparo -->
+                <div class="flex items-center justify-between w-full max-w-sm px-8 mb-8">
+                    <!-- Abrir Galeria -->
+                    <button onclick="document.getElementById('universal-file-input').click()" class="text-white p-3 rounded-full bg-black/20 backdrop-blur-sm">
+                        <i data-lucide="image" class="w-7 h-7"></i>
                     </button>
                     
-                    <!-- Botão Dinâmico de Ação -->
-                    <div class="relative flex items-center justify-center">
-                        <div id="video-timer" class="hidden absolute -top-12 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold font-mono">00:00</div>
+                    <!-- Filtros (Varinha Mágica) -->
+                    <button onclick="document.getElementById('camera-filters').classList.toggle('hidden')" class="text-white p-3 rounded-full bg-black/20 backdrop-blur-sm">
+                        <i data-lucide="wand-2" class="w-6 h-6"></i>
+                    </button>
+
+                    <!-- OBTURADOR -->
+                    <div class="relative">
+                        <div id="video-timer" class="hidden absolute -top-14 left-1/2 -translate-x-1/2 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold font-mono">00:00</div>
                         <button id="shutter-btn" onclick="window.handleCamAction()" class="shutter-btn">
                             <div class="shutter-inner"></div>
                         </button>
                     </div>
 
-                    <button id="cam-send-media" onclick="window.sendCapturedMedia()" class="hidden w-16 h-16 rounded-full bg-[#00a884] text-white flex items-center justify-center shadow-lg active:scale-90 transition-transform">
+                    <!-- Inverter Câmara -->
+                    <button onclick="window.switchCameraSource()" class="text-white p-3 rounded-full bg-black/20 backdrop-blur-sm">
+                        <i data-lucide="refresh-cw" class="w-7 h-7"></i>
+                    </button>
+
+                    <!-- Botão de Envio (Apenas em Review) -->
+                    <button id="cam-send-media" onclick="window.sendCapturedMedia()" class="hidden w-16 h-16 rounded-full bg-[#00a884] text-white flex items-center justify-center shadow-2xl scale-110">
                         <i data-lucide="send" class="w-8 h-8"></i>
                     </button>
+                </div>
+
+                <!-- Seletor de Modo Texto (WhatsApp Style) -->
+                <div id="cam-mode-selector" class="flex gap-8 items-center mb-2">
+                    <span onclick="window.setCamMode('video')" id="mode-video" class="cam-mode-label">Vídeo</span>
+                    <span onclick="window.setCamMode('photo')" id="mode-photo" class="cam-mode-label active">Foto</span>
+                    <span onclick="window.setCamMode('video-msg')" id="mode-video-msg" class="cam-mode-label">Recado de vídeo</span>
+                </div>
+
+                <!-- Barra de Filtros (Pop-up) -->
+                <div id="camera-filters" class="hidden w-full overflow-x-auto no-scrollbar flex gap-3 px-4 py-4 bg-black/60 backdrop-blur-xl absolute bottom-40 border-y border-white/10">
+                    <button onclick="window.applyCamFilter('none')" class="filter-chip active">Original</button>
+                    <button onclick="window.applyCamFilter('grayscale(100%)')" class="filter-chip">P&B</button>
+                    <button onclick="window.applyCamFilter('sepia(100%)')" class="filter-chip">Sépia</button>
+                    <button onclick="window.applyCamFilter('brightness(150%)')" class="filter-chip">Brilho</button>
+                    <button onclick="window.applyCamFilter('contrast(200%)')" class="filter-chip">Contraste</button>
                 </div>
             </div>
         </div>
@@ -1362,12 +1390,45 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
 
         window.setCamMode = (mode) => {
             if (camVideoRecorder && camVideoRecorder.state === 'recording') return;
-            camMode = mode;
-            document.getElementById('mode-photo').classList.toggle('active', mode === 'photo');
-            document.getElementById('mode-video').classList.toggle('active', mode === 'video');
-            document.getElementById('shutter-btn').classList.toggle('bg-red-500/20', mode === 'video');
-            const inner = document.querySelector('.shutter-inner');
-            inner.style.backgroundColor = mode === 'photo' ? 'white' : '#ff3b30';
+            camMode = (mode === 'video-msg') ? 'video' : mode; // Map video-msg to video logic
+            
+            // UI Toggle para as labels de texto
+            document.querySelectorAll('.cam-mode-label').forEach(el => el.classList.remove('active'));
+            const activeLabel = document.getElementById(`mode-${mode}`);
+            if(activeLabel) activeLabel.classList.add('active');
+            
+            // Shutter Style
+            const shutter = document.getElementById('shutter-btn');
+            const inner = shutter.querySelector('.shutter-inner');
+            
+            if (camMode === 'video') {
+                shutter.style.borderColor = 'rgba(255, 59, 48, 0.4)';
+                inner.style.backgroundColor = '#ff3b30';
+            } else {
+                shutter.style.borderColor = 'white';
+                inner.style.backgroundColor = 'white';
+            }
+            lucide.createIcons();
+        };
+
+        window.switchCameraSource = async () => {
+            if (cameraStreamObj) {
+                cameraStreamObj.getTracks().forEach(t => t.stop());
+            }
+            // Simulação de alternância entre front e back camera
+            const currentFacing = cameraStreamObj?.getVideoTracks()[0].getSettings().facingMode;
+            const newFacing = (currentFacing === 'user') ? 'environment' : 'user';
+            
+            try {
+                cameraStreamObj = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: newFacing, width: { ideal: 1280 }, height: { ideal: 720 } }, 
+                    audio: true 
+                });
+                document.getElementById('camera-stream').srcObject = cameraStreamObj;
+                showBlippNotification("Câmara", "Alternando visão...", "info");
+            } catch(e) {
+                showBlippNotification("Erro", "Não foi possível inverter a câmara.", "error");
+            }
         };
 
         window.handleCamAction = () => {
@@ -1399,10 +1460,15 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
 
         function startVideoRecording() {
             camVideoChunks = [];
-            camVideoRecorder = new MediaRecorder(cameraStreamObj);
-            camVideoRecorder.ondataavailable = (e) => camVideoChunks.push(e.data);
+            // Verificar suporte de codec para máxima compatibilidade mobile/desktop
+            const options = { mimeType: 'video/webm;codecs=vp8,opus' };
+            if (!MediaRecorder.isTypeSupported(options.mimeType)) options.mimeType = 'video/mp4';
+            
+            camVideoRecorder = new MediaRecorder(cameraStreamObj, options);
+            camVideoRecorder.ondataavailable = (e) => { if(e.data.size > 0) camVideoChunks.push(e.data); };
+            
             camVideoRecorder.onstop = () => {
-                const blob = new Blob(camVideoChunks, { type: 'video/webm' });
+                const blob = new Blob(camVideoChunks, { type: options.mimeType });
                 camCapturedBlob = blob;
                 const url = URL.createObjectURL(blob);
                 const review = document.getElementById('video-review');
@@ -1413,9 +1479,12 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
             };
 
             camVideoRecorder.start();
+            
+            // UI FeedBack
             document.getElementById('shutter-btn').classList.add('recording');
             document.getElementById('video-timer').classList.remove('hidden');
             document.getElementById('cam-mode-selector').classList.add('opacity-0', 'pointer-events-none');
+            showBlippNotification("Gravando", "O áudio também está a ser capturado.", "info");
             
             let secs = 0;
             camVideoTimer = setInterval(() => {
@@ -2276,7 +2345,8 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
         window.searchGifs = async (query) => {
             if(!query) return;
             const apiKey = '5G3yJ8FzP49UvS3v3R2g8W8Fp0q9K9Z4'; // Key pública demo
-            const url = `https://api.giphy.com/v1/gifs/${query === 'trending' ? 'trending' : 'search?q='+query}&amp;api_key=${apiKey}&amp;limit=10&amp;rating=g`;
+            // Correção de entidades & para evitar erro no editor
+            const url = `https://api.giphy.com/v1/gifs/${query === 'trending' ? 'trending' : 'search?q='+query}&api_key=${apiKey}&limit=10&rating=g`.replace(/&/g, '&amp;');
             try {
                 const res = await fetch(url);
                 const { data } = await res.json();
