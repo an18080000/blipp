@@ -88,7 +88,7 @@
         }
     </script>
     <style>
-        body { font-family: 'Inter', sans-serif; height: 100vh; overflow: hidden; background-color: #dadbd3; }
+        body { font-family: 'Inter', sans-serif; height: 100vh; height: 100dvh; overflow: hidden; background-color: #dadbd3; }
         .dark body { background-color: #0b141a; }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -108,9 +108,28 @@
             #main-wrapper.chat-active aside { transform: translateX(-100%); }
             #main-wrapper.chat-active main { transform: translateX(-100%); }
             nav { display: none; } /* Oculta a barra lateral de ícones no mobile */
-            .mobile-bottom-nav { display: flex !important; }
-            .mobile-fab { display: flex !important; }
+            .mobile-bottom-nav { 
+                display: flex !important; 
+                height: 140px !important; /* Aumentado para garantir que os botões subam bastante */
+                padding-bottom: 75px !important; /* Elevação extrema para fugir dos botões do Android/iPhone */
+                align-items: center !important;
+                background-color: white !important;
+                box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+            }
+            .dark .mobile-bottom-nav { background-color: #202c33 !important; }
+            .mobile-bottom-nav i { width: 22px; height: 22px; }
+            .mobile-bottom-nav span { font-size: 11px !important; margin-top: 6px; font-weight: 500; }
+            .mobile-fab { 
+                display: flex !important; 
+                bottom: 165px !important; /* Sobe o botão verde para acompanhar a nova altura da barra */
+                width: 56px !important; 
+                height: 56px !important; 
+            }
+            #sidebar-header { padding: 8px 12px !important; gap: 6px !important; }
+            #sidebar-title { font-size: 1.2rem !important; }
             .mobile-filters { display: flex !important; }
+            /* Diminuir um pouco as listas para ganhar espaço vertical */
+            #sidebar-content .p-3 { padding: 10px 12px !important; }
         }
 
         .tab-active { color: #008069; background: rgba(0, 128, 105, 0.1); border-radius: 50%; }
@@ -195,6 +214,15 @@
         .reply-box { border-left: 4px solid #00a884; background: rgba(0,0,0,0.05); padding: 5px 8px; border-radius: 4px; margin-bottom: 4px; font-size: 12px; }
         .dark .reply-box { background: rgba(255,255,255,0.05); }
     </style>
+
+<link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22index.Blipp%20-%20Chat.html%22%2C%22short_name%22%3A%22index.Blipp%20-%20Chat.html%22%2C%22display%22%3A%22standalone%22%2C%22start_url%22%3A%22.%22%2C%22background_color%22%3A%22%230f111a%22%2C%22theme_color%22%3A%22%233b82f6%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fapi.dicebear.com%2F7.x%2Fbottts%2Fsvg%3Fseed%3Dindex.Blipp%2520-%2520Chat.html%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%2C%7B%22src%22%3A%22https%3A%2F%2Fapi.dicebear.com%2F7.x%2Fbottts%2Fsvg%3Fseed%3Dindex.Blipp%2520-%2520Chat.html%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+<meta name="theme-color" content="#3b82f6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<script>
+let dP;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dP=e;const b=document.createElement('button');b.innerHTML='<svg style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;margin-right:6px" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Instalar App';b.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:99999;background:#3b82f6;color:#fff;border:none;padding:12px 24px;border-radius:50px;font-family:sans-serif;font-weight:600;font-size:14px;box-shadow:0 4px 20px rgba(59,130,246,0.4);cursor:pointer;display:flex;align-items:center;white-space:nowrap;transition:transform 0.2s;';b.onclick=async()=>{if(!dP)return;dP.prompt();const{outcome}=await dP.userChoice;if(outcome==='accepted')b.remove();dP=null;};document.body.appendChild(b);});
+const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());const isStandalone=()=>('standalone' in window.navigator)&&window.navigator.standalone;if(isIos()&&!isStandalone()){const ib=document.createElement('div');ib.innerHTML='Para instalar como App: toque em <b>Compartilhar</b> e depois <b>Adicionar ao Ecrã Principal</b><button style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#a1a1aa;font-size:16px;" onclick="this.parentElement.remove()">✕</button>';ib.style.cssText='position:fixed;bottom:0;left:0;width:100%;background:#1c1e2b;color:#fff;padding:15px 30px 15px 15px;font-family:sans-serif;font-size:12px;text-align:center;z-index:99999;border-top:1px solid #2b2d3a;box-shadow:0 -5px 15px rgba(0,0,0,0.2);';setTimeout(()=>document.body.appendChild(ib),2000);}
+</script>
 </head>
 <body class="flex items-center justify-center p-0 lg:p-4">
 
@@ -322,11 +350,11 @@
             </button>
 
             <!-- Bottom Navigation Mobile -->
-            <nav class="mobile-bottom-nav hidden lg:hidden h-[75px] border-t dark:border-gray-800 bg-white dark:bg-wa-darkHeader items-center shrink-0">
-                <button onclick="switchTab('chats')" class="mobile-bottom-item flex-1 flex flex-col items-center gap-1 active"><i data-lucide="message-square"></i><span class="text-[11px]">Conversas</span></button>
-                <button onclick="switchTab('status')" class="mobile-bottom-item flex-1 flex flex-col items-center gap-1 text-gray-400"><i data-lucide="circle-dashed"></i><span class="text-[11px]">Atualizações</span></button>
-                <button onclick="switchTab('calls')" class="mobile-bottom-item flex-1 flex flex-col items-center gap-1 text-gray-400"><i data-lucide="phone"></i><span class="text-[11px]">Chamadas</span></button>
-                <button onclick="switchTab('settings')" class="mobile-bottom-item flex-1 flex flex-col items-center gap-1 text-gray-400"><i data-lucide="settings"></i><span class="text-[11px]">Configurações</span></button>
+            <nav class="mobile-bottom-nav hidden lg:hidden border-t dark:border-gray-800 bg-white dark:bg-wa-darkHeader items-center shrink-0">
+                <button onclick="switchTab('chats')" class="mobile-bottom-item flex-1 flex flex-col items-center active"><i data-lucide="message-square"></i><span class="text-[11px]">Conversas</span></button>
+                <button onclick="switchTab('status')" class="mobile-bottom-item flex-1 flex flex-col items-center text-gray-400"><i data-lucide="circle-dashed"></i><span class="text-[11px]">Atualizações</span></button>
+                <button onclick="switchTab('calls')" class="mobile-bottom-item flex-1 flex flex-col items-center text-gray-400"><i data-lucide="phone"></i><span class="text-[11px]">Chamadas</span></button>
+                <button onclick="switchTab('settings')" class="mobile-bottom-item flex-1 flex flex-col items-center text-gray-400"><i data-lucide="settings"></i><span class="text-[11px]">Definições</span></button>
             </nav>
         </aside>
 
@@ -666,12 +694,12 @@
     <!-- OVERLAY DE CHAMADA (PROPORÇÃO WHATSAPP) -->
     <div id="call-overlay" class="hidden fixed inset-0 z-[1100] bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-wa-darkHeader w-full max-w-[360px] aspect-[9/16] rounded-3xl overflow-hidden relative shadow-2xl border border-gray-700 flex flex-col">
-            <!-- Background do Vídeo (Real/Simulado) -->
+            <!-- Background do Vídeo -->
             <div id="call-video-bg" class="absolute inset-0 bg-gray-900 flex items-center justify-center">
                 <video id="remote-video-el" class="absolute inset-0 w-full h-full object-cover hidden" autoplay playsinline></video>
                 <img id="call-user-avatar" src="" class="w-32 h-32 rounded-full border-4 border-wa-teal/50 object-cover z-0">
                 <div id="video-placeholder" class="hidden absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60 flex flex-col items-center justify-center z-10">
-                    <p class="text-white/50 text-sm animate-pulse">A aguardar sinal...</p>
+                    <p class="text-white/50 text-sm animate-pulse">Conectando...</p>
                 </div>
             </div>
 
@@ -680,36 +708,36 @@
                 <div class="flex flex-col items-center gap-2">
                     <div class="flex items-center gap-2 text-wa-green mb-1">
                         <i data-lucide="lock" class="w-3 h-3"></i>
-                        <span class="text-[10px] uppercase tracking-widest font-bold">Encriptação de ponta a ponta</span>
+                        <span class="text-[10px] uppercase tracking-widest font-bold">Privado e Seguro</span>
                     </div>
-                    <h2 id="call-user-name" class="text-2xl font-bold text-white">Nome do Contacto</h2>
-                    <p id="call-status-label" class="text-wa-green font-medium animate-pulse">A chamar...</p>
+                    <h2 id="call-user-name" class="text-2xl font-bold text-white truncate w-full px-4">Utilizador</h2>
+                    <p id="call-status-label" class="text-wa-green font-medium">A chamar...</p>
                 </div>
             </div>
 
             <!-- Preview da Minha Câmera (PiP) -->
-            <div id="my-video-preview" class="hidden absolute top-32 right-4 w-24 h-40 bg-black rounded-lg border border-white/40 shadow-2xl overflow-hidden z-30">
+            <div id="my-video-preview" class="hidden absolute top-1/4 right-4 w-28 h-44 bg-black rounded-xl border-2 border-white/20 shadow-2xl overflow-hidden z-30">
                 <video id="local-video-el" class="w-full h-full object-cover bg-gray-800" autoplay playsinline muted></video>
             </div>
 
             <!-- Controlos Inferiores -->
             <div class="relative z-10 mt-auto p-8 bg-gradient-to-t from-black/60 to-transparent flex flex-col gap-8">
-                <div class="flex justify-center items-center gap-6">
-                    <button class="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center backdrop-blur-md transition-all">
-                        <i data-lucide="volume-2"></i>
-                    </button>
-                    <button id="call-video-toggle" class="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center backdrop-blur-md transition-all">
-                        <i data-lucide="video-off"></i>
-                    </button>
-                    <button class="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center backdrop-blur-md transition-all">
-                        <i data-lucide="mic-off"></i>
-                    </button>
+                <!-- Botões de Resposta (Aparecem apenas ao receber) -->
+                <div id="incoming-call-controls" class="hidden flex justify-around items-center gap-8 py-4">
+                    <button type="button" onclick="rejectCall()" class="w-16 h-16 rounded-full bg-red-500 text-white flex items-center justify-center shadow-2xl active:scale-90 transition-transform"><i data-lucide="phone-off" class="w-8 h-8"></i></button>
+                    <button type="button" onclick="acceptCall()" class="w-16 h-16 rounded-full bg-wa-green text-white flex items-center justify-center shadow-2xl active:scale-90 transition-transform pulse-ring"><i data-lucide="phone" class="w-8 h-8"></i></button>
                 </div>
-                
-                <div class="flex justify-center">
-                    <button onclick="endCall()" class="w-16 h-16 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center shadow-lg transform active:scale-90 transition-all">
-                        <i data-lucide="phone-off" class="w-8 h-8"></i>
-                    </button>
+
+                <!-- Botões de Controlo (Aparecem durante a chamada) -->
+                <div id="active-call-controls" class="flex flex-col gap-6">
+                    <div class="flex justify-center items-center gap-6">
+                            <button type="button" onclick="toggleCallSpeaker()" id="call-speaker-toggle" class="w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center backdrop-blur-md"><i data-lucide="volume-2"></i></button>
+                            <button type="button" onclick="toggleCallVideo()" id="call-video-toggle" class="w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center backdrop-blur-md"><i data-lucide="video"></i></button>
+                            <button type="button" onclick="toggleCallMic()" id="call-mic-toggle" class="w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center backdrop-blur-md"><i data-lucide="mic"></i></button>
+                        </div>
+                    <div class="flex justify-center">
+                        <button onclick="endCall()" class="w-16 h-16 rounded-full bg-red-500 text-white flex items-center justify-center shadow-lg"><i data-lucide="phone-off" class="w-8 h-8"></i></button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -762,7 +790,9 @@
         const db = getFirestore(app);
 
         let currentUser = null, activeChatUser = null, activeChatId = null, unsubMessages = null, currentTab = 'chats';
-        let localStream = null, isMicMuted = false, isVideoOff = false, isSpeakerOff = false;
+        let localStream = null, pc = null, isMicMuted = false, isVideoOff = false, isSpeakerOff = false;
+        let currentCallId = null, callListenerUnsub = null, incomingCallType = null;
+        const iceConfig = { iceServers: [{ urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }] };
         
         // Definições de Configuração
         const getSettings = () => JSON.parse(localStorage.getItem('blipp_settings') || '{"callSounds":true, "msgSounds":true, "msgPreview":true, "notifSound":"https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3"}');
@@ -821,7 +851,8 @@
                     iconMic.setAttribute('data-lucide', 'square');
                     lucide.createIcons();
                 } catch (err) {
-                    showBlippNotification("Permissão", "Microfone não autorizado.", "error");
+                    const msg = err.name === 'NotAllowedError' ? "Permissão negada. Ative o microfone nas definições do navegador." : "Erro ao aceder ao microfone.";
+                    showBlippNotification("Erro Microfone", msg, "error");
                 }
             } else {
                 stopRecording();
@@ -908,10 +939,178 @@
                 await syncUser(user);
                 switchTab('chats');
                 startGlobalNotificationListener();
+                startIncomingCallListener(); // Monitorizar chamadas em tempo real
             } else {
                 document.getElementById('auth-container').classList.remove('hidden');
             }
         });
+
+        // MONITORIZAÇÃO DE CHAMADAS ENTRANTES
+        function startIncomingCallListener() {
+            const q = query(collection(db, "calls"), where("targetId", "==", currentUser.uid), where("status", "==", "ringing"));
+            onSnapshot(q, async (snapshot) => {
+                snapshot.docChanges().forEach(async (change) => {
+                    if (change.type === "added") {
+                        const callData = change.doc.data();
+                        currentCallId = change.doc.id;
+                        
+                        // Obter dados de quem está a ligar
+                        const callerDoc = await getDoc(doc(db, "users", callData.callerId));
+                        const caller = callerDoc.data();
+                        
+                        showIncomingCallUI(caller, callData.type);
+                    } else if (change.type === "modified") {
+                        if (change.doc.data().status === "ended") endCallUI();
+                    }
+                });
+            });
+        }
+
+        function showIncomingCallUI(caller, type) {
+            const overlay = document.getElementById('call-overlay');
+            document.getElementById('call-user-name').textContent = caller.displayName;
+            document.getElementById('call-user-avatar').src = caller.photoURL;
+            document.getElementById('call-status-label').textContent = `Chamada de ${type === 'video' ? 'vídeo' : 'voz'} a entrar...`;
+            
+            // Injetar o tipo no botão de aceitar para garantir permissão imediata sem gap async (evita NotAllowedError)
+            const acceptBtn = document.querySelector('#incoming-call-controls button:last-child');
+            if(acceptBtn) acceptBtn.setAttribute('onclick', `acceptCall('${type}')`);
+
+            document.getElementById('incoming-call-controls').classList.remove('hidden');
+            document.getElementById('active-call-controls').classList.add('hidden');
+            overlay.classList.remove('hidden');
+            
+            const settings = getSettings();
+            if (settings.callSounds) {
+                window.incomingRingtone = new Audio('https://assets.mixkit.co/active_storage/sfx/1359/1359-preview.mp3');
+                window.incomingRingtone.loop = true;
+                window.incomingRingtone.play().catch(() => {});
+            }
+            lucide.createIcons();
+        }
+
+        window.acceptCall = async (type) => {
+            if (!currentCallId) return;
+            
+            try {
+                // 1. Ativar hardware IMEDIATAMENTE
+                localStream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: true, 
+                    video: type === 'video' 
+                });
+                
+                if (window.incomingRingtone) window.incomingRingtone.pause();
+                await updateDoc(doc(db, "calls", currentCallId), { status: "accepted" });
+                
+                document.getElementById('incoming-call-controls').classList.add('hidden');
+                document.getElementById('active-call-controls').classList.remove('hidden');
+                document.getElementById('call-status-label').textContent = "Em curso";
+                
+                if (type === 'video') {
+                    const localVideo = document.getElementById('local-video-el');
+                    const myPreview = document.getElementById('my-video-preview');
+                    localVideo.srcObject = localStream;
+                    localVideo.classList.remove('hidden');
+                    myPreview.classList.remove('hidden');
+                    
+                    // Preparar placeholder enquanto o stream remoto (ontrack) não chega
+                    document.getElementById('video-placeholder').classList.remove('hidden');
+                    document.getElementById('call-user-avatar').classList.add('hidden');
+                    localVideo.play().catch(() => {});
+                }
+
+                // Configurar WebRTC PeerConnection
+                pc = new RTCPeerConnection(iceConfig);
+                localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+
+                pc.ontrack = (event) => {
+                    const remoteVideo = document.getElementById('remote-video-el');
+                    if (remoteVideo && event.streams[0]) {
+                        remoteVideo.srcObject = event.streams[0];
+                        remoteVideo.classList.remove('hidden');
+                        // Ocultar avatar e placeholder quando o stream remoto chega
+                        document.getElementById('call-user-avatar').classList.add('hidden');
+                        document.getElementById('video-placeholder').classList.add('hidden');
+                        // Forçar play imediato (necessário em muitos browsers mobile)
+                        remoteVideo.play().catch(e => console.log("Falha ao iniciar vídeo remoto:", e));
+                    }
+                };
+
+                pc.onicecandidate = (event) => {
+                    if (event.candidate) {
+                        addDoc(collection(db, "calls", currentCallId, "candidates"), {
+                            ...event.candidate.toJSON(),
+                            type: 'target'
+                        });
+                    }
+                };
+
+                const callDoc = await getDoc(doc(db, "calls", currentCallId));
+                const callData = callDoc.data();
+
+                await pc.setRemoteDescription(new RTCSessionDescription(callData.offer));
+                const answer = await pc.createAnswer();
+                await pc.setLocalDescription(answer);
+                await updateDoc(doc(db, "calls", currentCallId), { answer });
+
+                onSnapshot(collection(db, "calls", currentCallId, "candidates"), (snapshot) => {
+                    snapshot.docChanges().forEach(change => {
+                        if (change.type === 'added' && change.doc.data().type === 'caller') {
+                            pc.addIceCandidate(new RTCIceCandidate(change.doc.data()));
+                        }
+                    });
+                });
+
+                showBlippNotification("Chamada", "Conexão estabelecida.", "success");
+            } catch (err) {
+                console.error(err);
+                const msg = err.name === 'NotAllowedError' ? "Permissão negada. Ative o acesso à câmara/microfone no seu navegador." : "Falha ao conectar hardware.";
+                showBlippNotification("Erro de Chamada", msg, "error");
+                if (window.incomingRingtone) window.incomingRingtone.pause();
+                endCallUI();
+            }
+        };
+
+        window.rejectCall = async () => {
+            if (!currentCallId) return;
+            if (window.incomingRingtone) window.incomingRingtone.pause();
+            await updateDoc(doc(db, "calls", currentCallId), { status: "ended" });
+            endCallUI();
+        };
+
+        function endCallUI() {
+            const overlay = document.getElementById('call-overlay');
+            overlay.classList.add('hidden');
+            
+            if (window.incomingRingtone) window.incomingRingtone.pause();
+            if (window.currentRingtone) window.currentRingtone.pause();
+            
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+            }
+
+            if (pc) {
+                pc.close();
+                pc = null;
+            }
+
+            // Limpar fontes de vídeo e resetar UI
+            const lv = document.getElementById('local-video-el');
+            const rv = document.getElementById('remote-video-el');
+            const avatar = document.getElementById('call-user-avatar');
+            const placeholder = document.getElementById('video-placeholder');
+            const myPreview = document.getElementById('my-video-preview');
+
+            if(lv) { lv.srcObject = null; lv.classList.add('hidden'); }
+            if(rv) { rv.srcObject = null; rv.classList.add('hidden'); }
+            if(avatar) avatar.classList.remove('hidden');
+            if(placeholder) placeholder.classList.add('hidden');
+            if(myPreview) myPreview.classList.add('hidden');
+
+            currentCallId = null;
+            showBlippNotification("Chamada", "Chamada terminada.", "info");
+        }
 
         async function syncUser(user) {
             const ref = doc(db, "users", user.uid);
@@ -1898,51 +2097,114 @@
             const settings = getSettings();
             
             try {
-                localStream = await navigator.mediaDevices.getUserMedia({ 
-                    audio: true, 
-                    video: type === 'video' 
-                });
-                
+                // 1. Preparar Hardware Local IMEDIATAMENTE com validação de permissão
+                try {
+                    localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: type === 'video' });
+                } catch (mediaErr) {
+                    const msg = mediaErr.name === 'NotAllowedError' ? "Permissão negada. Ative o acesso nas definições do navegador." : "Câmara ou microfone não encontrados.";
+                    showBlippNotification("Erro Hardware", msg, "error");
+                    return;
+                }
                 isMicMuted = false;
                 isVideoOff = type !== 'video';
-                isSpeakerOff = false;
 
+                // 2. Criar sinal de chamada no Firestore
+                const callRef = await addDoc(collection(db, "calls"), {
+                    callerId: currentUser.uid,
+                    targetId: activeChatUser.uid,
+                    type: type,
+                    status: "ringing",
+                    timestamp: serverTimestamp()
+                });
+                currentCallId = callRef.id;
+
+                // 3. UI Inicial
                 const overlay = document.getElementById('call-overlay');
-                const nameEl = document.getElementById('call-user-name');
-                const avatarEl = document.getElementById('call-user-avatar');
-                const statusLabel = document.getElementById('call-status-label');
-                const videoPip = document.getElementById('my-video-preview');
-                const videoPlaceholder = document.getElementById('video-placeholder');
+                document.getElementById('call-user-name').textContent = activeChatUser.displayName;
+                document.getElementById('call-user-avatar').src = activeChatUser.photoURL;
+                document.getElementById('call-status-label').textContent = "A chamar...";
+                document.getElementById('incoming-call-controls').classList.add('hidden');
+                document.getElementById('active-call-controls').classList.remove('hidden');
 
-                nameEl.textContent = activeChatUser.displayName;
-                avatarEl.src = activeChatUser.photoURL;
-                statusLabel.textContent = type === 'video' ? 'Chamada de vídeo...' : 'Chamada de voz...';
-                
                 if (type === 'video') {
-                    videoPip.classList.remove('hidden');
-                    videoPlaceholder.classList.remove('hidden');
-                    avatarEl.classList.add('opacity-20', 'blur-sm');
-                    
-                    // Ativa o stream no elemento de vídeo local
-                    const localVideo = document.getElementById('local-video-el');
-                    if (localVideo) localVideo.srcObject = localStream;
+                    document.getElementById('my-video-preview').classList.remove('hidden');
+                    document.getElementById('local-video-el').srcObject = localStream;
+                    document.getElementById('local-video-el').classList.remove('hidden');
                 } else {
-                    videoPip.classList.add('hidden');
-                    videoPlaceholder.classList.add('hidden');
-                    avatarEl.classList.remove('opacity-20', 'blur-sm');
+                    document.getElementById('my-video-preview').classList.add('hidden');
                 }
 
                 overlay.classList.remove('hidden');
                 lucide.createIcons();
+
+                // 4. Configurar WebRTC PeerConnection (Lado de quem liga)
+                pc = new RTCPeerConnection(iceConfig);
+                localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+
+                pc.ontrack = (event) => {
+                    const remoteVideo = document.getElementById('remote-video-el');
+                    if (remoteVideo && event.streams[0]) {
+                        remoteVideo.srcObject = event.streams[0];
+                        // Se for chamada de vídeo, trocar avatar pelo vídeo
+                        if (type === 'video') {
+                            remoteVideo.classList.remove('hidden');
+                            document.getElementById('call-user-avatar').classList.add('hidden');
+                            document.getElementById('video-placeholder').classList.add('hidden');
+                        }
+                        remoteVideo.play().catch(e => console.error("Erro ao reproduzir stream remoto:", e));
+                    }
+                };
+
+                pc.onicecandidate = (event) => {
+                    if (event.candidate) {
+                        addDoc(collection(db, "calls", currentCallId, "candidates"), {
+                            ...event.candidate.toJSON(),
+                            type: 'caller'
+                        });
+                    }
+                };
+
+                const offer = await pc.createOffer();
+                await pc.setLocalDescription(offer);
+                await updateDoc(doc(db, "calls", currentCallId), { offer });
+
+                // Monitorizar resposta e candidatos remotos
+                onSnapshot(doc(db, "calls", currentCallId), (snap) => {
+                    if (snap.exists()) {
+                        const data = snap.data();
+                        if (data.status === "accepted" && data.answer && !pc.currentRemoteDescription) {
+                            document.getElementById('call-status-label').textContent = "Em curso";
+                            if (window.currentRingtone) window.currentRingtone.pause();
+                            pc.setRemoteDescription(new RTCSessionDescription(data.answer));
+                            
+                            // Se for vídeo, ajustar UI no lado de quem ligou
+                            if (type === 'video') {
+                                document.getElementById('remote-video-el').classList.remove('hidden');
+                                document.getElementById('call-user-avatar').classList.add('hidden');
+                                document.getElementById('video-placeholder').classList.add('hidden');
+                            }
+                        } else if (data.status === "ended") {
+                            endCallUI();
+                        }
+                    }
+                });
+
+                onSnapshot(collection(db, "calls", currentCallId, "candidates"), (snapshot) => {
+                    snapshot.docChanges().forEach(change => {
+                        if (change.type === 'added' && change.doc.data().type === 'target') {
+                            pc.addIceCandidate(new RTCIceCandidate(change.doc.data()));
+                        }
+                    });
+                });
                 
                 if (settings.callSounds) {
-                    const ringtone = new Audio('https://assets.mixkit.co/active_storage/sfx/1359/1359-preview.mp3');
-                    ringtone.loop = true;
-                    ringtone.play().catch(() => {});
-                    window.currentRingtone = ringtone;
+                    window.currentRingtone = new Audio('https://assets.mixkit.co/active_storage/sfx/1359/1359-preview.mp3');
+                    window.currentRingtone.loop = true;
+                    window.currentRingtone.play().catch(() => {});
                 }
             } catch (err) {
-                showBlippNotification("Erro de Hardware", "Não foi possível aceder à câmara/microfone.", "error");
+                console.error(err);
+                showBlippNotification("Erro", "Erro ao aceder à câmera ou microfone.", "error");
             }
         };
 
@@ -1950,7 +2212,7 @@
             if (!localStream) return;
             isMicMuted = !isMicMuted;
             localStream.getAudioTracks().forEach(track => track.enabled = !isMicMuted);
-            const btn = document.querySelector('[data-lucide="mic-off"]')?.parentElement || document.querySelector('[data-lucide="mic"]')?.parentElement;
+            const btn = document.getElementById('call-mic-toggle');
             if (btn) {
                 btn.innerHTML = `<i data-lucide="${isMicMuted ? 'mic-off' : 'mic'}"></i>`;
                 btn.classList.toggle('bg-red-500', isMicMuted);
@@ -1983,17 +2245,11 @@
             lucide.createIcons();
         };
 
-        window.endCall = () => {
-            document.getElementById('call-overlay').classList.add('hidden');
-            if (window.currentRingtone) {
-                window.currentRingtone.pause();
-                window.currentRingtone = null;
+        window.endCall = async () => {
+            if (currentCallId) {
+                await updateDoc(doc(db, "calls", currentCallId), { status: "ended" });
             }
-            if (localStream) {
-                localStream.getTracks().forEach(track => track.stop());
-                localStream = null;
-            }
-            showBlippNotification("Chamada Terminada", "A chamada foi encerrada.", "info");
+            endCallUI();
         };
 
         // MENSAGENS TEMPORÁRIAS
