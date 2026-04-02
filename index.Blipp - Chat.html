@@ -940,44 +940,54 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
     </div>
 
     <!-- CAMERA MODAL (BLIPP STUDIO) - OVERLAY SUPREMO -->
-    <div id="camera-modal" class="hidden fixed inset-0 z-[5000] bg-black flex flex-col">
+    <div id="camera-modal" class="hidden fixed inset-0 z-[5000] bg-black flex flex-col items-center justify-center">
         <!-- Preview em Tempo Real -->
-        <video id="camera-stream" class="absolute inset-0 w-full h-full object-cover" autoplay playsinline></video>
+        <video id="camera-stream" class="absolute inset-0 w-full h-full object-cover" autoplay playsinline muted></video>
         
-        <!-- Foto Capturada (Para Edição) -->
+        <!-- Foto Capturada ou Vídeo Gravado (Para Edição/Preview) -->
         <canvas id="camera-canvas" class="hidden absolute inset-0 w-full h-full object-cover"></canvas>
+        <video id="video-review" class="hidden absolute inset-0 w-full h-full object-cover" controls playsinline loop></video>
 
         <div class="camera-overlay">
             <!-- Header: Fechar e Controles -->
-            <div class="flex justify-between items-center">
-                <button onclick="window.closeCamera()" class="p-2 text-white"><i data-lucide="x" class="w-8 h-8"></i></button>
+            <div class="flex justify-between items-center w-full">
+                <button onclick="window.closeCamera()" class="p-2 text-white bg-black/20 rounded-full"><i data-lucide="x" class="w-8 h-8"></i></button>
                 <div id="camera-edit-tools" class="hidden flex gap-4">
                     <button id="cam-view-once" onclick="window.toggleCameraViewOnce()" class="w-10 h-10 rounded-full border-2 border-white text-white flex items-center justify-center font-bold text-sm transition-colors">1</button>
                 </div>
             </div>
 
-            <!-- Footer: Filtros e Shutter -->
-            <div class="flex flex-col gap-6 items-center">
-                <!-- Barra de Filtros (Apenas após capturar) -->
+            <!-- Footer: Modos, Filtros e Shutter -->
+            <div class="flex flex-col gap-6 items-center w-full">
+                <!-- Seletor de Modo (Foto / Vídeo) -->
+                <div id="cam-mode-selector" class="flex gap-4 mb-2">
+                    <button onclick="window.setCamMode('photo')" id="mode-photo" class="cam-mode-btn active">FOTO</button>
+                    <button onclick="window.setCamMode('video')" id="mode-video" class="cam-mode-btn">VÍDEO</button>
+                </div>
+
+                <!-- Barra de Filtros (Apenas para Fotos) -->
                 <div id="camera-filters" class="hidden w-full overflow-x-auto no-scrollbar flex gap-3 px-4 py-2">
                     <button onclick="window.applyCamFilter('none')" class="filter-chip active">Original</button>
                     <button onclick="window.applyCamFilter('grayscale(100%)')" class="filter-chip">P&B</button>
                     <button onclick="window.applyCamFilter('sepia(100%)')" class="filter-chip">Sépia</button>
                     <button onclick="window.applyCamFilter('brightness(150%)')" class="filter-chip">Brilho</button>
                     <button onclick="window.applyCamFilter('contrast(200%)')" class="filter-chip">Contraste</button>
-                    <button onclick="window.applyCamFilter('invert(100%)')" class="filter-chip">Negativo</button>
                 </div>
 
-                <div class="flex items-center justify-between w-full max-w-xs mb-4">
-                    <button id="cam-cancel-photo" onclick="window.resetCamera()" class="hidden text-white flex flex-col items-center gap-1">
-                        <i data-lucide="refresh-cw"></i><span class="text-[10px]">Repetir</span>
+                <div class="flex items-center justify-between w-full max-w-[320px] mb-8">
+                    <button id="cam-cancel-media" onclick="window.resetCamera()" class="hidden text-white bg-black/40 p-3 rounded-full flex flex-col items-center gap-1 transition-all">
+                        <i data-lucide="refresh-cw" class="w-6 h-6"></i>
                     </button>
                     
-                    <button id="shutter-btn" onclick="window.takePhoto()" class="shutter-btn">
-                        <div class="shutter-inner"></div>
-                    </button>
+                    <!-- Botão Dinâmico de Ação -->
+                    <div class="relative flex items-center justify-center">
+                        <div id="video-timer" class="hidden absolute -top-12 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold font-mono">00:00</div>
+                        <button id="shutter-btn" onclick="window.handleCamAction()" class="shutter-btn">
+                            <div class="shutter-inner"></div>
+                        </button>
+                    </div>
 
-                    <button id="cam-send-photo" onclick="window.sendCapturedPhoto()" class="hidden w-16 h-16 rounded-full bg-[#00a884] text-white flex items-center justify-center shadow-lg active:scale-95 transition-transform">
+                    <button id="cam-send-media" onclick="window.sendCapturedMedia()" class="hidden w-16 h-16 rounded-full bg-[#00a884] text-white flex items-center justify-center shadow-lg active:scale-90 transition-transform">
                         <i data-lucide="send" class="w-8 h-8"></i>
                     </button>
                 </div>
@@ -1060,6 +1070,7 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
         let mediaRecorder = null, audioChunks = [], recordTimer = null, secondsElapsed = 0;
         let selectedFile = null, isViewOnce = false;
         let cameraStreamObj = null, camCapturedBlob = null, camFilter = 'none', camViewOnce = false;
+        let camMode = 'photo', camVideoRecorder = null, camVideoChunks = [], camVideoTimer = null;
         let sidebarUnsub = null;
 
         lucide.createIcons();
@@ -1329,26 +1340,49 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
             input.click();
         };
 
-        // BLIPP CAMERA STUDIO LOGIC
+        // BLIPP CAMERA STUDIO 2.0 - SUPORTE FOTO E VÍDEO
         window.openCamera = async () => {
             const modal = document.getElementById('camera-modal');
             const video = document.getElementById('camera-stream');
             
             try {
+                // Solicitar câmara e áudio para suportar gravação de vídeo
                 cameraStreamObj = await navigator.mediaDevices.getUserMedia({ 
                     video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } }, 
-                    audio: false 
+                    audio: true 
                 });
                 video.srcObject = cameraStreamObj;
                 modal.classList.remove('hidden');
                 window.resetCamera();
                 lucide.createIcons();
             } catch (err) {
-                showBlippNotification("Erro Câmara", "Não foi possível aceder à câmara.", "error");
+                showBlippNotification("Erro Studio", "Sem permissão para câmara ou microfone.", "error");
             }
         };
 
-        window.takePhoto = () => {
+        window.setCamMode = (mode) => {
+            if (camVideoRecorder && camVideoRecorder.state === 'recording') return;
+            camMode = mode;
+            document.getElementById('mode-photo').classList.toggle('active', mode === 'photo');
+            document.getElementById('mode-video').classList.toggle('active', mode === 'video');
+            document.getElementById('shutter-btn').classList.toggle('bg-red-500/20', mode === 'video');
+            const inner = document.querySelector('.shutter-inner');
+            inner.style.backgroundColor = mode === 'photo' ? 'white' : '#ff3b30';
+        };
+
+        window.handleCamAction = () => {
+            if (camMode === 'photo') {
+                takePhoto();
+            } else {
+                if (!camVideoRecorder || camVideoRecorder.state === 'inactive') {
+                    startVideoRecording();
+                } else {
+                    stopVideoRecording();
+                }
+            }
+        };
+
+        function takePhoto() {
             const video = document.getElementById('camera-stream');
             const canvas = document.getElementById('camera-canvas');
             const ctx = canvas.getContext('2d');
@@ -1358,32 +1392,66 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
             ctx.filter = camFilter;
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             
-            // UI Transition
             video.classList.add('hidden');
             canvas.classList.remove('hidden');
-            document.getElementById('camera-filters').classList.remove('hidden');
+            enterCamReviewMode('image');
+        }
+
+        function startVideoRecording() {
+            camVideoChunks = [];
+            camVideoRecorder = new MediaRecorder(cameraStreamObj);
+            camVideoRecorder.ondataavailable = (e) => camVideoChunks.push(e.data);
+            camVideoRecorder.onstop = () => {
+                const blob = new Blob(camVideoChunks, { type: 'video/webm' });
+                camCapturedBlob = blob;
+                const url = URL.createObjectURL(blob);
+                const review = document.getElementById('video-review');
+                review.src = url;
+                review.classList.remove('hidden');
+                document.getElementById('camera-stream').classList.add('hidden');
+                enterCamReviewMode('video');
+            };
+
+            camVideoRecorder.start();
+            document.getElementById('shutter-btn').classList.add('recording');
+            document.getElementById('video-timer').classList.remove('hidden');
+            document.getElementById('cam-mode-selector').classList.add('opacity-0', 'pointer-events-none');
+            
+            let secs = 0;
+            camVideoTimer = setInterval(() => {
+                secs++;
+                const m = Math.floor(secs / 60).toString().padStart(2, '0');
+                const s = (secs % 60).toString().padStart(2, '0');
+                document.getElementById('video-timer').textContent = `${m}:${s}`;
+            }, 1000);
+        }
+
+        function stopVideoRecording() {
+            if (camVideoRecorder) camVideoRecorder.stop();
+            clearInterval(camVideoTimer);
+            document.getElementById('shutter-btn').classList.remove('recording');
+            document.getElementById('video-timer').classList.add('hidden');
+            document.getElementById('video-timer').textContent = "00:00";
+        }
+
+        function enterCamReviewMode(type) {
+            document.getElementById('camera-filters').classList.toggle('hidden', type !== 'image');
             document.getElementById('camera-edit-tools').classList.remove('hidden');
             document.getElementById('shutter-btn').classList.add('hidden');
-            document.getElementById('cam-cancel-photo').classList.remove('hidden');
-            document.getElementById('cam-send-photo').classList.remove('hidden');
-            
+            document.getElementById('cam-mode-selector').classList.add('hidden');
+            document.getElementById('cam-cancel-media').classList.remove('hidden');
+            document.getElementById('cam-send-media').classList.remove('hidden');
             lucide.createIcons();
-        };
+        }
 
         window.applyCamFilter = (filter) => {
             camFilter = filter;
             const canvas = document.getElementById('camera-canvas');
             const video = document.getElementById('camera-stream');
             const ctx = canvas.getContext('2d');
-            
-            // Redesenhar com filtro
             ctx.filter = filter;
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            
-            // Atualizar chips
-            document.querySelectorAll('.filter-chip').forEach(c => {
-                c.classList.toggle('active', c.innerText.toLowerCase().includes(filter === 'none' ? 'original' : ''));
-            });
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.toggle('active', c.innerText.toLowerCase().includes(filter === 'none' ? 'original' : '')));
         };
 
         window.toggleCameraViewOnce = () => {
@@ -1391,22 +1459,27 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
             const btn = document.getElementById('cam-view-once');
             btn.classList.toggle('bg-wa-teal', camViewOnce);
             btn.classList.toggle('border-wa-teal', camViewOnce);
-            showBlippNotification("Modo", camViewOnce ? "Visualização única ativada." : "Visualização única desativada.", "info");
         };
 
         window.resetCamera = () => {
             const video = document.getElementById('camera-stream');
             const canvas = document.getElementById('camera-canvas');
+            const review = document.getElementById('video-review');
             
             video.classList.remove('hidden');
             canvas.classList.add('hidden');
+            review.classList.add('hidden');
+            review.src = "";
+            
             document.getElementById('camera-filters').classList.add('hidden');
             document.getElementById('camera-edit-tools').classList.add('hidden');
             document.getElementById('shutter-btn').classList.remove('hidden');
-            document.getElementById('cam-cancel-photo').classList.add('hidden');
-            document.getElementById('cam-send-photo').classList.add('hidden');
+            document.getElementById('cam-mode-selector').classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+            document.getElementById('cam-cancel-media').classList.add('hidden');
+            document.getElementById('cam-send-media').classList.add('hidden');
             
             camFilter = 'none';
+            camCapturedBlob = null;
             camViewOnce = false;
             document.getElementById('cam-view-once').classList.remove('bg-wa-teal', 'border-wa-teal');
         };
@@ -1419,31 +1492,37 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
             document.getElementById('camera-modal').classList.add('hidden');
         };
 
-        window.sendCapturedPhoto = async () => {
-            const canvas = document.getElementById('camera-canvas');
-            canvas.toBlob(async (blob) => {
-                const file = new File([blob], `blipp_capture_${Date.now()}.jpg`, { type: 'image/jpeg' });
-                const viewOnce = camViewOnce;
-                
-                window.closeCamera();
-                showBlippNotification("Blipp Studio", "A processar foto...", "info");
-                
-                try {
-                    const url = await window.uploadFileToR2(file, 'images');
-                    await addDoc(collection(db, 'chats', activeChatId, 'messages'), {
-                        senderId: currentUser.uid,
-                        text: "",
-                        mediaUrl: url,
-                        mediaType: 'image',
-                        fileName: file.name,
-                        isViewOnce: viewOnce,
-                        viewers: [],
-                        timestamp: serverTimestamp()
-                    });
-                } catch (err) {
-                    showBlippNotification("Erro R2", "Falha ao enviar foto.", "error");
-                }
-            }, 'image/jpeg', 0.9);
+        window.sendCapturedMedia = async () => {
+            showBlippNotification("Studio", "A processar media...", "info");
+            const viewOnce = camViewOnce;
+            let file, type;
+
+            if (camMode === 'photo') {
+                const canvas = document.getElementById('camera-canvas');
+                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.9));
+                file = new File([blob], `blipp_photo_${Date.now()}.jpg`, { type: 'image/jpeg' });
+                type = 'image';
+            } else {
+                file = new File([camCapturedBlob], `blipp_video_${Date.now()}.mp4`, { type: 'video/mp4' });
+                type = 'video';
+            }
+            
+            window.closeCamera();
+            try {
+                const url = await window.uploadFileToR2(file, type + 's');
+                await addDoc(collection(db, 'chats', activeChatId, 'messages'), {
+                    senderId: currentUser.uid,
+                    text: "",
+                    mediaUrl: url,
+                    mediaType: type,
+                    fileName: file.name,
+                    isViewOnce: viewOnce,
+                    viewers: [],
+                    timestamp: serverTimestamp()
+                });
+            } catch (err) {
+                showBlippNotification("Erro R2", "Falha ao enviar captura.", "error");
+            }
         };
 
         window.toggleViewOnce = () => {
@@ -2197,7 +2276,7 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
         window.searchGifs = async (query) => {
             if(!query) return;
             const apiKey = '5G3yJ8FzP49UvS3v3R2g8W8Fp0q9K9Z4'; // Key pública demo
-            const url = `https://api.giphy.com/v1/gifs/${query === 'trending' ? 'trending' : 'search?q='+query}&api_key=${apiKey}&limit=10&rating=g`;
+            const url = `https://api.giphy.com/v1/gifs/${query === 'trending' ? 'trending' : 'search?q='+query}&amp;api_key=${apiKey}&amp;limit=10&amp;rating=g`;
             try {
                 const res = await fetch(url);
                 const { data } = await res.json();
