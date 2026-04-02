@@ -347,10 +347,18 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
             <header id="sidebar-header" class="p-2 flex flex-col gap-2 border-b dark:border-gray-800">
                 <div class="flex justify-between items-center px-2">
                     <h1 id="sidebar-title" class="text-xl font-bold text-wa-teal lg:dark:text-white dark:text-wa-teal">WhatsApp</h1>
-                    <div class="flex gap-3 text-gray-500">
+                    <div class="flex gap-3 text-gray-500 items-center">
+                        <!-- Botões Desktop Adicionais -->
+                        <button onclick="openNewContactModal()" title="Adicionar Contacto" class="hidden lg:block hover:text-wa-teal transition-colors">
+                            <i data-lucide="user-plus" class="w-5 h-5"></i>
+                        </button>
+                        <button onclick="showAddContactForm(); document.getElementById('new-contact-modal').classList.remove('hidden');" title="Escanear / O Meu QR" class="hidden lg:block hover:text-wa-teal transition-colors">
+                            <i data-lucide="qr-code" class="w-5 h-5"></i>
+                        </button>
+                        
                         <button class="lg:hidden"><i data-lucide="camera" class="w-5 h-5"></i></button>
-                        <button onclick="openNewGroupModal()" title="Novo Grupo"><i data-lucide="plus" class="w-5 h-5"></i></button>
-                        <button onclick="switchTab('settings')" title="Configurações" class="hidden lg:block"><i data-lucide="settings" class="w-4 h-4"></i></button>
+                        <button onclick="openNewGroupModal()" title="Novo Grupo" class="hover:text-wa-teal transition-colors"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                        <button onclick="switchTab('settings')" title="Configurações" class="hidden lg:block hover:text-wa-teal transition-colors"><i data-lucide="settings" class="w-4 h-4"></i></button>
                     </div>
                 </div>
                 
