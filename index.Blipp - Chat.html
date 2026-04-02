@@ -194,12 +194,27 @@
         .dark .media-tab-active { color: #25D366; border-bottom-color: #25D366; }
         .gif-item:hover { transform: scale(1.05); transition: 0.2s; }
 
-        /* Audio & Recording */
+        /* Audio & Recording WhatsApp Style */
         .recording-pulse { animation: pulse-red 1.5s infinite; }
         @keyframes pulse-red { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.2); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
         .audio-wave { display: flex; align-items: center; gap: 2px; height: 20px; }
         .audio-wave span { width: 3px; background: #00a884; border-radius: 10px; animation: wave-anim 1s infinite ease-in-out; }
         @keyframes wave-anim { 0%, 100% { height: 5px; } 50% { height: 15px; } }
+
+        /* Cadeado de Gravação */
+        #recording-lock-ui {
+            position: absolute; bottom: 70px; right: 8px;
+            display: none; flex-direction: column; align-items: center; gap: 8px;
+            background: white; padding: 12px 8px; border-radius: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 100;
+            animation: slideUpLock 0.3s ease-out;
+        }
+        .dark #recording-lock-ui { background: #202c33; border: 1px solid #374045; }
+        @keyframes slideUpLock { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        /* Botão de Gravação Dinâmico */
+        #main-action-btn { transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        #main-action-btn.recording { background-color: #ff3b30; transform: scale(1.2); }
 
         /* Profile & Wallpaper Styles */
         .profile-cover { height: 180px; background-size: cover; background-position: center; position: relative; }
@@ -641,27 +656,35 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
                         <div onclick="triggerFileType('camera')" class="attachment-item bg-[#ec407a]" title="Câmara"><i data-lucide="camera"></i></div>
                     </div>
 
-                    <form id="message-form" class="flex items-center gap-2 px-1">
+                    <form id="message-form" class="flex items-center gap-2 px-1 relative">
+                        <!-- UI CADEADO GRAVAÇÃO -->
+                        <div id="recording-lock-ui">
+                            <i data-lucide="lock" class="w-4 h-4 text-gray-400"></i>
+                            <div class="w-1 h-8 bg-gray-100 dark:bg-gray-800 rounded-full relative overflow-hidden">
+                                <div id="lock-progress" class="absolute bottom-0 left-0 right-0 bg-wa-teal transition-all" style="height: 0%"></div>
+                            </div>
+                        </div>
+
                         <!-- Input Estilo Cápsula WhatsApp -->
-                        <div class="flex-1 flex items-center bg-white dark:bg-[#2a3942] rounded-full shadow-sm px-2 overflow-hidden border border-transparent focus-within:border-gray-300 dark:focus-within:border-gray-600 transition-all">
+                        <div id="input-capsule" class="flex-1 flex items-center bg-white dark:bg-[#2a3942] rounded-full shadow-sm px-2 overflow-hidden border border-transparent focus-within:border-gray-300 dark:focus-within:border-gray-600 transition-all">
                             <button type="button" onclick="toggleMediaPicker()" class="p-2 text-[#8696a0] hover:text-[#54656f] transition-colors"><i data-lucide="smile" class="w-6 h-6"></i></button>
                             
                             <input id="message-input" type="text" placeholder="Mensagem" class="flex-1 py-3 px-1 bg-transparent dark:text-white outline-none text-[16px] placeholder-[#8696a0]">
                             
                             <div id="recording-status" class="hidden px-3 flex items-center gap-2 text-red-500 flex-1">
                                 <span class="recording-pulse w-2 h-2 bg-red-500 rounded-full"></span>
-                                <span id="recording-timer" class="text-sm font-mono">00:00</span>
+                                <span id="recording-timer" class="text-[15px] font-medium text-gray-700 dark:text-white">00:00</span>
+                                <span class="text-xs text-gray-400 animate-pulse ml-auto pr-4">Deslize para cancelar</span>
                             </div>
 
                             <button type="button" onclick="toggleAttachmentMenu(event)" class="p-2 text-[#8696a0] -rotate-45 hover:text-[#54656f] transition-colors"><i data-lucide="paperclip" class="w-6 h-6"></i></button>
-                            
                             <input type="file" id="universal-file-input" class="hidden" onchange="handleFileSelection(this)">
-                            
                             <button type="button" onclick="triggerFileType('camera')" class="p-2 text-[#8696a0] hover:text-[#54656f] transition-colors"><i data-lucide="camera" class="w-6 h-6"></i></button>
                         </div>
 
-                        <!-- Botão de Ação Circular Verde -->
-                        <button type="submit" id="main-action-btn" class="w-12 h-12 flex items-center justify-center bg-[#00a884] text-white rounded-full shadow-lg active:scale-90 transition-transform shrink-0">
+                        <!-- BOTÃO DE AÇÃO UNIFICADO (Voz e Texto) -->
+                        <button type="button" id="main-action-btn" 
+                                class="w-12 h-12 flex items-center justify-center bg-[#00a884] text-white rounded-full shadow-lg shrink-0 transition-all">
                             <i data-lucide="mic" id="icon-mic" class="w-6 h-6"></i>
                             <i data-lucide="send" id="icon-send" class="hidden w-6 h-6"></i>
                         </button>
@@ -938,61 +961,145 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
 
         lucide.createIcons();
 
-        // LÓGICA DE ÁUDIO E UI DINÂMICA
+        // LÓGICA DE ÁUDIO UNIFICADA SUPREMA (WHATSAPP CLONE)
         const messageInput = document.getElementById('message-input');
+        const mainActionBtn = document.getElementById('main-action-btn');
         const iconMic = document.getElementById('icon-mic');
         const iconSend = document.getElementById('icon-send');
+        const lockUI = document.getElementById('recording-lock-ui');
+        const lockProgress = document.getElementById('lock-progress');
 
+        let isRecording = false;
+        let isLocked = false;
+        let startY = 0;
+        let recordCancelled = false;
+
+        // Alternar Ícone por Input de Texto
         messageInput.addEventListener('input', () => {
-            const hasText = messageInput.value.trim().length > 0;
-            iconMic.classList.toggle('hidden', hasText);
-            iconSend.classList.toggle('hidden', !hasText);
+            const hasText = messageInput.value.trim().length > 0 || selectedFile !== null;
+            if(hasText) {
+                iconMic.classList.add('hidden');
+                iconSend.classList.remove('hidden');
+            } else {
+                iconMic.classList.remove('hidden');
+                iconSend.classList.add('hidden');
+            }
         });
 
-        window.toggleRecording = async () => {
-            if (!mediaRecorder || mediaRecorder.state === 'inactive') {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    mediaRecorder = new MediaRecorder(stream);
-                    audioChunks = [];
+        // Efeito de Hover: Trocar para Mic se estiver vazio (Feedback Visual)
+        mainActionBtn.addEventListener('mouseenter', () => {
+            if(messageInput.value.trim().length === 0 && !selectedFile) {
+                iconMic.classList.remove('hidden');
+                iconSend.classList.add('hidden');
+            }
+        });
 
-                    mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
-                    
-                    mediaRecorder.onstop = async () => {
-                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                        const audioFile = new File([audioBlob], `audio_${Date.now()}.webm`, { type: 'audio/webm' });
-                        
-                        showBlippNotification("Blipp Áudio", "A enviar mensagem de voz...", "info");
-                        try {
-                            const url = await window.uploadFileToR2(audioFile, 'audios');
-                            await addDoc(collection(db, 'chats', activeChatId, 'messages'), {
-                                senderId: currentUser.uid,
-                                text: '',
-                                mediaUrl: url,
-                                mediaType: 'audio',
-                                timestamp: serverTimestamp()
-                            });
-                        } catch (err) {
-                            console.error(err);
-                            showBlippNotification("Erro", "Falha ao enviar áudio.", "error");
-                        }
-                    };
-
-                    mediaRecorder.start();
-                    startTimer();
-                    document.getElementById('recording-status').classList.remove('hidden');
-                    messageInput.classList.add('hidden');
-                    iconMic.classList.add('text-red-500', 'recording-pulse');
-                    iconMic.setAttribute('data-lucide', 'square');
-                    lucide.createIcons();
-                } catch (err) {
-                    const msg = err.name === 'NotAllowedError' ? "Permissão negada. Ative o microfone nas definições do navegador." : "Erro ao aceder ao microfone.";
-                    showBlippNotification("Erro Microfone", msg, "error");
-                }
+        // GESTÃO DE EVENTOS (MOUSE E TOUCH)
+        const startAction = (e) => {
+            const hasText = messageInput.value.trim().length > 0 || selectedFile !== null;
+            if (hasText) {
+                document.getElementById('message-form').dispatchEvent(new Event('submit'));
             } else {
-                stopRecording();
+                startY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+                startRecordingProcess();
             }
         };
+
+        const moveAction = (e) => {
+            if (!isRecording || isLocked) return;
+            const currentY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+            const diffY = startY - currentY;
+            const threshold = 60; // Distância para bloquear
+
+            if (diffY > 10) {
+                lockUI.style.display = 'flex';
+                const percent = Math.min((diffY / threshold) * 100, 100);
+                lockProgress.style.height = `${percent}%`;
+            }
+
+            if (diffY >= threshold) {
+                lockRecording();
+            }
+        };
+
+        const endAction = () => {
+            if (isRecording && !isLocked) {
+                stopRecordingProcess(false);
+            }
+        };
+
+        mainActionBtn.addEventListener('mousedown', startAction);
+        mainActionBtn.addEventListener('touchstart', startAction, { passive: true });
+        window.addEventListener('mousemove', moveAction);
+        window.addEventListener('touchmove', moveAction, { passive: true });
+        window.addEventListener('mouseup', endAction);
+        window.addEventListener('touchend', endAction);
+
+        async function startRecordingProcess() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                recordCancelled = false;
+
+                mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
+                mediaRecorder.onstop = async () => {
+                    if (recordCancelled) return;
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const audioFile = new File([audioBlob], `audio_${Date.now()}.webm`, { type: 'audio/webm' });
+                    const url = await window.uploadFileToR2(audioFile, 'audios');
+                    await addDoc(collection(db, 'chats', activeChatId, 'messages'), {
+                        senderId: currentUser.uid,
+                        text: '', mediaUrl: url, mediaType: 'audio', timestamp: serverTimestamp()
+                    });
+                };
+
+                mediaRecorder.start();
+                isRecording = true;
+                startTimer();
+                
+                mainActionBtn.classList.add('recording');
+                document.getElementById('recording-status').classList.remove('hidden');
+                document.getElementById('input-capsule').classList.add('bg-red-50/50', 'dark:bg-red-900/10');
+                messageInput.classList.add('hidden');
+                iconMic.classList.add('recording-pulse');
+            } catch (err) {
+                showBlippNotification("Erro", "Sem acesso ao microfone.", "error");
+            }
+        }
+
+        function lockRecording() {
+            isLocked = true;
+            lockUI.innerHTML = '<i data-lucide="lock" class="text-wa-teal w-5 h-5"></i>';
+            lucide.createIcons();
+            showBlippNotification("Voz", "Gravação bloqueada. Toque no botão para enviar.", "info");
+            mainActionBtn.onclick = () => stopRecordingProcess(false);
+        }
+
+        function stopRecordingProcess(cancelled = false) {
+            if (!isRecording) return;
+            recordCancelled = cancelled;
+            
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(t => t.stop());
+            }
+
+            isRecording = false;
+            isLocked = false;
+            stopTimer();
+
+            // Reset UI
+            mainActionBtn.classList.remove('recording');
+            mainActionBtn.onclick = null;
+            document.getElementById('recording-status').classList.add('hidden');
+            document.getElementById('input-capsule').classList.remove('bg-red-50/50', 'dark:bg-red-900/10');
+            messageInput.classList.remove('hidden');
+            iconMic.classList.remove('recording-pulse');
+            lockUI.style.display = 'none';
+            lockUI.innerHTML = '<i data-lucide="lock" class="w-4 h-4 text-gray-400"></i><div class="w-1 h-8 bg-gray-100 dark:bg-gray-800 rounded-full relative overflow-hidden"><div id="lock-progress" class="absolute bottom-0 left-0 right-0 bg-wa-teal transition-all" style="height: 0%"></div></div>';
+            lucide.createIcons();
+        }
 
         // LÓGICA DE FICHEIROS (PAPERCLIP)
         window.toggleAttachmentMenu = (e) => {
@@ -1076,18 +1183,8 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
             };
         };
 
-        function stopRecording() {
-            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-                mediaRecorder.stop();
-                stopTimer();
-                document.getElementById('recording-status').classList.add('hidden');
-                messageInput.classList.remove('hidden');
-                iconMic.classList.remove('text-red-500', 'recording-pulse');
-                iconMic.setAttribute('data-lucide', 'mic');
-                lucide.createIcons();
-                mediaRecorder.stream.getTracks().forEach(track => track.stop());
-            }
-        }
+        // Função auxiliar para cancelar gravação (ex: via botão X que pode ser adicionado)
+        window.cancelRecording = () => stopRecordingProcess(true);
 
         function startTimer() {
             secondsElapsed = 0;
@@ -2968,11 +3065,8 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
                 }
                 await addDoc(collection(db, 'chats', activeChatId, 'messages'), msgData);
                 messageInput.value = '';
-                iconMic.classList.remove('hidden');
-                iconSend.classList.add('hidden');
-            } else {
-                // Se clicar sem texto nem ficheiro, inicia/para gravação
-                window.toggleRecording();
+                // Forçar atualização do estado dos botões
+                messageInput.dispatchEvent(new Event('input'));
             }
         };
 
