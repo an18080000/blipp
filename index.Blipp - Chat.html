@@ -247,6 +247,17 @@
 
         .reply-box { border-left: 4px solid #00a884; background: rgba(0,0,0,0.05); padding: 5px 8px; border-radius: 4px; margin-bottom: 4px; font-size: 12px; }
         .dark .reply-box { background: rgba(255,255,255,0.05); }
+
+        /* Estilos de Visualização Única */
+        .view-once-bubble { display: flex; align-items: center; gap: 8px; padding: 10px; border-radius: 12px; cursor: pointer; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
+        .view-once-opened { opacity: 0.5; cursor: default; }
+        .view-once-icon { width: 24px; height: 24px; border-radius: 50%; border: 2px dashed currentColor; display: flex; items-center; justify-center; font-size: 10px; font-weight: bold; }
+        
+        /* Menu de Anexos WhatsApp Style */
+        .attachment-menu { position: absolute; bottom: 80px; left: 10px; display: none; flex-direction: column-reverse; gap: 10px; animation: slideUp 0.2s ease-out; z-index: 100; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .attachment-item { width: 50px; height: 50px; border-radius: 50%; display: flex; items-center; justify-center; color: white; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: transform 0.2s; }
+        .attachment-item:hover { transform: scale(1.1); }
     </style>
 
 <link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22index.Blipp%20-%20Chat.html%22%2C%22short_name%22%3A%22index.Blipp%20-%20Chat.html%22%2C%22display%22%3A%22standalone%22%2C%22start_url%22%3A%22.%22%2C%22background_color%22%3A%22%230f111a%22%2C%22theme_color%22%3A%22%233b82f6%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fapi.dicebear.com%2F7.x%2Fbottts%2Fsvg%3Fseed%3Dindex.Blipp%2520-%2520Chat.html%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%2C%7B%22src%22%3A%22https%3A%2F%2Fapi.dicebear.com%2F7.x%2Fbottts%2Fsvg%3Fseed%3Dindex.Blipp%2520-%2520Chat.html%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
@@ -400,17 +411,9 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
                     <input type="text" placeholder="Pesquisar" class="bg-transparent border-none outline-none text-[14px] w-full dark:text-white placeholder-gray-500">
                 </div>
 
-                <!-- Filtros Ultra Compactos -->
-                <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 px-1">
-                    <button class="bg-wa-teal/10 text-wa-teal px-3 py-1 rounded-full text-[12px] font-semibold whitespace-nowrap active:scale-95 transition-transform">Todas</button>
-                    <button class="bg-gray-100 dark:bg-gray-800 text-gray-500 px-3 py-1 rounded-full text-[12px] font-semibold whitespace-nowrap hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Não lidas</button>
-                    <button class="bg-gray-100 dark:bg-gray-800 text-gray-500 px-3 py-1 rounded-full text-[12px] font-semibold whitespace-nowrap hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Favoritos</button>
-                    <button class="bg-gray-100 dark:bg-gray-800 text-gray-500 px-3 py-1 rounded-full text-[12px] font-semibold whitespace-nowrap hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Grupos</button>
-                    
-                    <!-- BOTÃO NOVA LISTA (IGUAL AO WHATSAPP) -->
-                    <button onclick="createNewListPrompt()" class="bg-gray-100 dark:bg-gray-800 text-gray-500 p-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 shrink-0 transition-all" title="Nova Lista">
-                        <i data-lucide="plus" class="w-4 h-4"></i>
-                    </button>
+                <!-- Filtros Ultra Compactos (DINÂMICOS) -->
+                <div id="filter-bar" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 px-1">
+                    <!-- Gerado via JS -->
                 </div>
             </header>
 
@@ -606,15 +609,36 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
                     </div>
 
                     <!-- PREVIEW DE FICHEIRO SELECIONADO -->
-                    <div id="file-preview" class="hidden absolute bottom-[80px] left-2 right-2 bg-white dark:bg-wa-darkHeader p-4 rounded-2xl shadow-2xl flex items-center justify-between border dark:border-gray-700">
-                        <div class="flex items-center gap-3">
-                            <div class="p-2 bg-wa-bg dark:bg-wa-darkBg rounded-lg"><i data-lucide="file-text" class="text-wa-teal"></i></div>
-                            <div class="min-w-0">
-                                <p id="file-preview-name" class="text-sm font-bold truncate dark:text-white"></p>
-                                <p id="file-preview-size" class="text-xs text-gray-500"></p>
+                    <div id="file-preview" class="hidden absolute bottom-[80px] left-2 right-2 bg-white dark:bg-wa-darkHeader p-4 rounded-2xl shadow-2xl flex flex-col gap-4 border dark:border-gray-700 z-[110]">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div id="preview-icon-box" class="p-3 bg-wa-bg dark:bg-wa-darkBg rounded-xl text-wa-teal">
+                                    <i data-lucide="file-text"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <p id="file-preview-name" class="text-sm font-bold truncate dark:text-white max-w-[200px]"></p>
+                                    <p id="file-preview-size" class="text-xs text-gray-500"></p>
+                                </div>
                             </div>
+                            <button onclick="cancelFileUpload()" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
+                                <i data-lucide="x" class="text-gray-400"></i>
+                            </button>
                         </div>
-                        <button onclick="cancelFileUpload()"><i data-lucide="x" class="text-gray-400"></i></button>
+                        <!-- Opções de Envio -->
+                        <div class="flex items-center justify-between border-t dark:border-gray-700 pt-3">
+                            <button id="view-once-toggle" onclick="toggleViewOnce()" class="flex items-center gap-2 text-gray-500 hover:text-wa-teal transition-colors">
+                                <div class="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center text-[10px] font-bold">1</div>
+                                <span class="text-xs font-bold uppercase tracking-wider">Visualização Única</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- MENU DE ANEXOS (WHATSAPP CLONE) -->
+                    <div id="attachment-menu" class="attachment-menu">
+                        <div onclick="triggerFileType('file')" class="attachment-item bg-[#7f66ff]" title="Documento"><i data-lucide="file-text"></i></div>
+                        <div onclick="triggerFileType('image')" class="attachment-item bg-[#d3396d]" title="Galeria"><i data-lucide="image"></i></div>
+                        <div onclick="triggerFileType('audio')" class="attachment-item bg-[#ff9208]" title="Áudio"><i data-lucide="music"></i></div>
+                        <div onclick="triggerFileType('camera')" class="attachment-item bg-[#ec407a]" title="Câmara"><i data-lucide="camera"></i></div>
                     </div>
 
                     <form id="message-form" class="flex items-center gap-2 px-1">
@@ -629,10 +653,11 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
                                 <span id="recording-timer" class="text-sm font-mono">00:00</span>
                             </div>
 
-                            <button type="button" onclick="document.getElementById('file-input').click()" class="p-2 text-[#8696a0] -rotate-45 hover:text-[#54656f] transition-colors"><i data-lucide="paperclip" class="w-6 h-6"></i></button>
-                            <input type="file" id="file-input" class="hidden" onchange="handleFileSelection(this)">
+                            <button type="button" onclick="toggleAttachmentMenu(event)" class="p-2 text-[#8696a0] -rotate-45 hover:text-[#54656f] transition-colors"><i data-lucide="paperclip" class="w-6 h-6"></i></button>
                             
-                            <button type="button" class="p-2 text-[#8696a0] hover:text-[#54656f] transition-colors"><i data-lucide="camera" class="w-6 h-6"></i></button>
+                            <input type="file" id="universal-file-input" class="hidden" onchange="handleFileSelection(this)">
+                            
+                            <button type="button" onclick="triggerFileType('camera')" class="p-2 text-[#8696a0] hover:text-[#54656f] transition-colors"><i data-lucide="camera" class="w-6 h-6"></i></button>
                         </div>
 
                         <!-- Botão de Ação Circular Verde -->
@@ -899,6 +924,7 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
         window.db = db;
 
         let currentUser = null, activeChatUser = null, activeChatId = null, unsubMessages = null, currentTab = 'chats';
+        let currentFilter = 'all'; // all, unread, favorites, groups, or listName
         let localStream = null, pc = null, isMicMuted = false, isVideoOff = false, isSpeakerOff = false;
         let currentCallId = null, callListenerUnsub = null, incomingCallType = null;
         const iceConfig = { iceServers: [{ urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }] };
@@ -907,7 +933,7 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
         const getSettings = () => JSON.parse(localStorage.getItem('blipp_settings') || '{"callSounds":true, "msgSounds":true, "msgPreview":true, "notifSound":"https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3"}');
         const saveSettings = (s) => localStorage.setItem('blipp_settings', JSON.stringify(s));
         let mediaRecorder = null, audioChunks = [], recordTimer = null, secondsElapsed = 0;
-        let selectedFile = null;
+        let selectedFile = null, isViewOnce = false;
         let sidebarUnsub = null;
 
         lucide.createIcons();
@@ -969,6 +995,33 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
         };
 
         // LÓGICA DE FICHEIROS (PAPERCLIP)
+        window.toggleAttachmentMenu = (e) => {
+            e.stopPropagation();
+            const menu = document.getElementById('attachment-menu');
+            const isHidden = menu.style.display !== 'flex';
+            menu.style.display = isHidden ? 'flex' : 'none';
+            if(isHidden) {
+                document.addEventListener('click', () => menu.style.display = 'none', { once: true });
+            }
+        };
+
+        window.triggerFileType = (type) => {
+            const input = document.getElementById('universal-file-input');
+            input.setAttribute('accept', '');
+            if(type === 'image') input.setAttribute('accept', 'image/*,video/*');
+            else if(type === 'audio') input.setAttribute('accept', 'audio/*');
+            else if(type === 'camera') input.setAttribute('accept', 'image/*'); // Mobile aciona câmara
+            input.click();
+        };
+
+        window.toggleViewOnce = () => {
+            isViewOnce = !isViewOnce;
+            const btn = document.getElementById('view-once-toggle');
+            btn.classList.toggle('text-wa-teal', isViewOnce);
+            btn.classList.toggle('text-gray-500', !isViewOnce);
+            showBlippNotification("Modo", isViewOnce ? "Visualização única ativada." : "Visualização única desativada.", "info");
+        };
+
         window.handleFileSelection = (input) => {
             selectedFile = input.files[0];
             if (!selectedFile) return;
@@ -976,18 +1029,30 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
             const preview = document.getElementById('file-preview');
             const nameDisp = document.getElementById('file-preview-name');
             const sizeDisp = document.getElementById('file-preview-size');
+            const iconBox = document.getElementById('preview-icon-box');
 
             nameDisp.textContent = selectedFile.name;
-            sizeDisp.textContent = (selectedFile.size / 1024).toFixed(1) + ' KB';
+            sizeDisp.textContent = (selectedFile.size / (1024 * 1024)).toFixed(2) + ' MB';
             
+            // Alterar ícone conforme tipo
+            if(selectedFile.type.startsWith('image/')) iconBox.innerHTML = '<i data-lucide="image"></i>';
+            else if(selectedFile.type.startsWith('video/')) iconBox.innerHTML = '<i data-lucide="video"></i>';
+            else if(selectedFile.type.startsWith('audio/')) iconBox.innerHTML = '<i data-lucide="music"></i>';
+            else iconBox.innerHTML = '<i data-lucide="file-text"></i>';
+
+            isViewOnce = false; // Reset toggle
+            document.getElementById('view-once-toggle').classList.remove('text-wa-teal');
+
             preview.classList.remove('hidden');
             iconMic.classList.add('hidden');
             iconSend.classList.remove('hidden');
+            lucide.createIcons();
         };
 
         window.cancelFileUpload = () => {
             selectedFile = null;
-            document.getElementById('file-input').value = '';
+            isViewOnce = false;
+            document.getElementById('universal-file-input').value = '';
             document.getElementById('file-preview').classList.add('hidden');
             const hasText = messageInput.value.trim().length > 0;
             iconMic.classList.toggle('hidden', hasText);
@@ -1259,6 +1324,7 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
         // TABS NAVIGATION
         window.switchTab = (tab) => {
             currentTab = tab;
+            currentFilter = 'all'; // Reset filter on tab change
             const titles = { chats: 'Conversas', contacts: 'Contactos', status: 'Status', channels: 'Canais', communities: 'Comunidades', calls: 'Chamadas', settings: 'Configurações' };
             const titleEl = document.getElementById('sidebar-title');
             if (titleEl) titleEl.textContent = titles[tab] || 'Blipp';
@@ -1281,6 +1347,11 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
             if(tab === 'settings') header.classList.add('hidden');
             else header.classList.remove('hidden');
 
+            renderSidebarContent();
+        };
+
+        window.setChatFilter = (filter) => {
+            currentFilter = filter;
             renderSidebarContent();
         };
 
@@ -1419,12 +1490,39 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
                     container.appendChild(item);
                 });
             } else if (currentTab === 'chats') {
+                const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+                const userData = userDoc.data() || {};
+                const customLists = userData.customLists || [];
+                const favorites = userData.favorites || [];
+
+                // Renderizar Barra de Filtros
+                const filterBar = document.getElementById('filter-bar');
+                if(filterBar) {
+                    const filters = [
+                        { id: 'all', label: 'Todas' },
+                        { id: 'unread', label: 'Não lidas' },
+                        { id: 'favorites', label: 'Favoritos' },
+                        { id: 'groups', label: 'Grupos' },
+                        ...customLists.map(l => ({ id: 'custom_' + l.name, label: l.name }))
+                    ];
+                    filterBar.innerHTML = filters.map(f => `
+                        <button onclick="setChatFilter('${f.id}')" class="px-3 py-1 rounded-full text-[12px] font-semibold whitespace-nowrap transition-all active:scale-95 ${currentFilter === f.id ? 'bg-wa-teal/15 text-wa-teal' : 'bg-gray-100 dark:bg-gray-800 text-gray-500'}">
+                            ${f.label}
+                        </button>
+                    `).join('') + `
+                        <button onclick="createNewListPrompt()" class="bg-gray-100 dark:bg-gray-800 text-gray-500 p-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 shrink-0 transition-all" title="Nova Lista">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                        </button>
+                    `;
+                    lucide.createIcons();
+                }
+
                 const q = query(collection(db, "chats"), where("participants", "array-contains", currentUser.uid));
                 
                 sidebarUnsub = onSnapshot(q, async (s) => {
                     if (s.empty) { container.innerHTML = '<div class="p-10 text-center text-gray-400">Inicie uma conversa ou grupo.</div>'; return; }
                     
-                    // Preparar lista de promessas para evitar desfasamento visual
+                    // Preparar lista de promessas
                     const chatPromises = s.docs.map(async (d) => {
                         const chatData = d.data();
                         const chatID = d.id;
@@ -1448,11 +1546,35 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
                     const blockedList = userData.blocked || [];
                     const mutedList = userData.muted || {};
 
-                    const chats = await Promise.all(chatPromises);
-                    // Ordenação: Apenas por última atualização (as mais recentes no topo)
+                    let chats = await Promise.all(chatPromises);
+
+                    // --- APLICAR FILTROS EM TEMPO REAL ---
+                    if (currentFilter === 'unread') {
+                        chats = chats.filter(c => c.data.unreadCount && c.data.unreadCount[currentUser.uid] > 0);
+                    } else if (currentFilter === 'favorites') {
+                        chats = chats.filter(c => favorites.includes(c.id));
+                    } else if (currentFilter === 'groups') {
+                        chats = chats.filter(c => c.data.isGroup);
+                    } else if (currentFilter.startsWith('custom_')) {
+                        const listName = currentFilter.replace('custom_', '');
+                        const targetList = customLists.find(l => l.name === listName);
+                        if (targetList) {
+                            chats = chats.filter(c => {
+                                const otherId = c.data.participants.find(id => id !== currentUser.uid);
+                                return targetList.members.includes(otherId) || targetList.members.includes(c.id);
+                            });
+                        }
+                    }
+
+                    // Ordenação: Recentes no topo
                     chats.sort((a, b) => (b.data.lastUpdate?.seconds || 0) - (a.data.lastUpdate?.seconds || 0));
 
                     container.innerHTML = '';
+                    if(chats.length === 0) {
+                        container.innerHTML = `<div class="p-10 text-center text-gray-400 text-sm">Nenhuma conversa encontrada neste filtro.</div>`;
+                        return;
+                    }
+
                     chats.forEach(c => {
                         const otherId = c.data.participants?.find(id => id !== currentUser.uid);
                         const isBlocked = blockedList.includes(otherId);
@@ -1784,20 +1906,48 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
             const name = document.getElementById('group-name-input').value.trim();
             if(!name || selectedForGroup.length === 0) return alert("Defina o nome e selecione pelo menos 1 membro.");
 
-            const participants = [currentUser.uid, ...selectedForGroup];
-            const groupRef = await addDoc(collection(db, "chats"), {
-                isGroup: true,
-                groupName: name,
-                groupAvatar: null,
-                participants: participants,
-                createdBy: currentUser.uid,
-                lastMessage: "Grupo criado",
-                lastUpdate: serverTimestamp()
-            });
+            // Se o modal estiver no modo "Lista", guardamos como metadados do utilizador
+            if(window.isCreatingList) {
+                await updateDoc(doc(db, "users", currentUser.uid), {
+                    customLists: arrayUnion({ name: name, members: selectedForGroup })
+                });
+                showBlippNotification("Blipp Listas", `Lista "${name}" criada!`, 'success');
+            } else {
+                const participants = [currentUser.uid, ...selectedForGroup];
+                await addDoc(collection(db, "chats"), {
+                    isGroup: true,
+                    groupName: name,
+                    groupAvatar: null,
+                    participants: participants,
+                    createdBy: currentUser.uid,
+                    lastMessage: "Grupo criado",
+                    lastUpdate: serverTimestamp()
+                });
+                showBlippNotification("Blipp Grupos", `Grupo "${name}" criado!`, 'success');
+            }
 
-            showBlippNotification("Blipp Grupos", `Grupo "${name}" criado!`, 'success');
             closeGroupModal();
             renderSidebarContent();
+        };
+
+        window.createNewListPrompt = () => {
+            window.isCreatingList = true;
+            openNewGroupModal();
+            const header = document.querySelector('#group-modal h3');
+            if(header) header.innerText = "Criar Nova Lista";
+            const btn = document.querySelector('#group-modal footer button');
+            if(btn) btn.innerText = "CRIAR LISTA";
+        };
+
+        // Resetar o estado do modal ao fechar
+        const originalCloseGroup = window.closeGroupModal;
+        window.closeGroupModal = () => {
+            window.isCreatingList = false;
+            const header = document.querySelector('#group-modal h3');
+            if(header) header.innerText = "Criar Novo Grupo";
+            const btn = document.querySelector('#group-modal footer button');
+            if(btn) btn.innerText = "CRIAR GRUPO";
+            originalCloseGroup();
         };
 
         window.openGroupChat = async (groupId, data) => {
@@ -1952,10 +2102,30 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
                         }
 
                         if(d.mediaUrl) {
-                            if(d.mediaType === 'sticker') content += `<img src="${d.mediaUrl}" class="w-32 h-32 object-contain">`;
-                            else if(d.mediaType === 'gif') content += `<img src="${d.mediaUrl}" class="w-full max-h-60 rounded-lg object-cover">`;
-                            else if(d.mediaType === 'audio') content += `<div class="flex items-center gap-3 min-w-[220px] p-1"><button onclick="playAudio(this, 'audio-${m.id}')" class="w-10 h-10 flex items-center justify-center bg-wa-teal text-white rounded-full hover:bg-wa-green transition-colors"><i data-lucide="play" class="w-5 h-5 fill-current"></i></button><div class="flex-1 flex flex-col gap-1"><div class="audio-wave"><span></span><span style="animation-delay:0.1s"></span><span style="animation-delay:0.2s"></span><span style="animation-delay:0.4s"></span><span style="animation-delay:0.3s"></span></div><span class="text-[10px] opacity-60 uppercase font-bold tracking-tighter">Voz</span></div><audio id="audio-${m.id}" src="${d.mediaUrl}" class="hidden"></audio></div>`;
-                            else if(d.mediaType === 'file') content += `<a href="${d.mediaUrl}" target="_blank" class="flex items-center gap-3 p-2 bg-black/5 dark:bg-white/5 rounded-lg border dark:border-gray-700"><i data-lucide="file-text" class="text-wa-teal"></i><div class="min-w-0 flex-1"><p class="text-xs font-bold truncate">${d.fileName || 'Ficheiro'}</p></div><i data-lucide="download" class="w-4 h-4 opacity-40"></i></a>`;
+                            const isOpened = d.isViewOnce && d.viewers?.includes(currentUser.uid);
+                            
+                            if (d.isViewOnce) {
+                                content += `
+                                    <div onclick="handleViewOnceClick('${m.id}', '${d.mediaUrl}', '${d.mediaType}')" class="view-once-bubble ${isOpened ? 'view-once-opened' : ''}">
+                                        <div class="view-once-icon">${isOpened ? '✓' : '1'}</div>
+                                        <span class="font-bold">${isOpened ? 'Mensagem aberta' : (d.mediaType === 'image' ? 'Foto' : (d.mediaType === 'video' ? 'Vídeo' : 'Ficheiro'))}</span>
+                                    </div>`;
+                            } else {
+                                if(d.mediaType === 'sticker') content += `<img src="${d.mediaUrl}" class="w-32 h-32 object-contain">`;
+                                else if(d.mediaType === 'gif') content += `<img src="${d.mediaUrl}" class="w-full max-h-60 rounded-lg object-cover">`;
+                                else if(d.mediaType === 'image') content += `
+                                    <div class="relative group">
+                                        <img src="${d.mediaUrl}" class="w-full max-h-80 rounded-lg object-cover cursor-pointer">
+                                        <button onclick="downloadMedia('${d.mediaUrl}', '${d.fileName || 'image.jpg'}')" class="absolute top-2 right-2 p-2 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"><i data-lucide="download" class="w-4 h-4"></i></button>
+                                    </div>`;
+                                else if(d.mediaType === 'video') content += `
+                                    <div class="relative group">
+                                        <video src="${d.mediaUrl}" class="w-full max-h-80 rounded-lg object-cover" controls></video>
+                                        <button onclick="downloadMedia('${d.mediaUrl}', '${d.fileName || 'video.mp4'}')" class="absolute top-2 right-12 p-2 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"><i data-lucide="download" class="w-4 h-4"></i></button>
+                                    </div>`;
+                                else if(d.mediaType === 'audio') content += `<div class="flex items-center gap-3 min-w-[220px] p-1"><button onclick="playAudio(this, 'audio-${m.id}')" class="w-10 h-10 flex items-center justify-center bg-wa-teal text-white rounded-full hover:bg-wa-green transition-colors"><i data-lucide="play" class="w-5 h-5 fill-current"></i></button><div class="flex-1 flex flex-col gap-1"><div class="audio-wave"><span></span><span style="animation-delay:0.1s"></span><span style="animation-delay:0.2s"></span><span style="animation-delay:0.4s"></span><span style="animation-delay:0.3s"></span></div><span class="text-[10px] opacity-60 uppercase font-bold tracking-tighter">Áudio</span></div><audio id="audio-${m.id}" src="${d.mediaUrl}" class="hidden"></audio></div>`;
+                                else content += `<div class="flex flex-col gap-1"><a href="${d.mediaUrl}" target="_blank" class="flex items-center gap-3 p-2 bg-black/5 dark:bg-white/5 rounded-lg border dark:border-gray-700"><i data-lucide="file-text" class="text-wa-teal"></i><div class="min-w-0 flex-1"><p class="text-xs font-bold truncate">${d.fileName || 'Documento'}</p><p class="text-[10px] opacity-50">Documento</p></div><i data-lucide="download" class="w-4 h-4 opacity-40"></i></a></div>`;
+                            }
                         }
                         content += `<span>${d.text}</span>`;
                         
@@ -2718,6 +2888,38 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
             addFriendBtn.onclick = () => openNewContactModal();
         }
 
+        // LÓGICA DE DOWNLOAD
+        window.downloadMedia = (url, name) => {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = name;
+            a.target = "_blank";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showBlippNotification("Download", "A iniciar transferência...", "success");
+        };
+
+        // LÓGICA DE VISUALIZAÇÃO ÚNICA
+        window.handleViewOnceClick = async (msgId, url, type) => {
+            const msgRef = doc(db, 'chats', activeChatId, 'messages', msgId);
+            const msgSnap = await getDoc(msgRef);
+            const data = msgSnap.data();
+
+            if (data.viewers?.includes(currentUser.uid)) {
+                return showBlippNotification("Atenção", "Esta mensagem de visualização única já foi aberta.", "error");
+            }
+
+            // Abrir em Modal de Ecrã Inteiro (Simulação simplificada para o snippet)
+            if (confirm(`Deseja abrir esta média de visualização única? Ela desaparecerá após fechar.`)) {
+                window.open(url, '_blank');
+                // Marcar como aberta
+                await updateDoc(msgRef, {
+                    viewers: arrayUnion(currentUser.uid)
+                });
+            }
+        };
+
         // SUBMIT FORM (TEXTO, FICHEIRO OU ÁUDIO)
         document.getElementById('message-form').onsubmit = async (e) => {
             e.preventDefault();
@@ -2725,21 +2927,30 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
 
             if (selectedFile) {
                 const fileToUpload = selectedFile;
+                const viewOnceState = isViewOnce;
+                const mime = fileToUpload.type;
+                let type = 'file';
+                if(mime.startsWith('image/')) type = 'image';
+                else if(mime.startsWith('video/')) type = 'video';
+                else if(mime.startsWith('audio/')) type = 'audio';
+
                 cancelFileUpload(); // Limpar UI
-                showBlippNotification("Blipp", "A enviar ficheiro...", "info");
+                showBlippNotification("Cloud R2", "A processar ficheiro...", "info");
                 try {
-                    const url = await window.uploadFileToR2(fileToUpload, 'files');
+                    const url = await window.uploadFileToR2(fileToUpload, type + 's');
                     await addDoc(collection(db, 'chats', activeChatId, 'messages'), {
                         senderId: currentUser.uid,
-                        text: text || `[Ficheiro: ${fileToUpload.name}]`,
+                        text: text || "",
                         mediaUrl: url,
-                        mediaType: 'file',
+                        mediaType: type,
                         fileName: fileToUpload.name,
+                        isViewOnce: viewOnceState,
+                        viewers: [],
                         timestamp: serverTimestamp()
                     });
                     messageInput.value = '';
                 } catch (err) {
-                    showBlippNotification("Erro", "Falha ao enviar ficheiro.", "error");
+                    showBlippNotification("Erro R2", "Falha ao enviar ficheiro.", "error");
                 }
                 return;
             }
