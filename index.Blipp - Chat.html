@@ -939,8 +939,8 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
         </div>
     </div>
 
-    <!-- CAMERA MODAL (BLIPP STUDIO) -->
-    <div id="camera-modal" class="hidden fixed inset-0 flex flex-col">
+    <!-- CAMERA MODAL (BLIPP STUDIO) - OVERLAY SUPREMO -->
+    <div id="camera-modal" class="hidden fixed inset-0 z-[5000] bg-black flex flex-col">
         <!-- Preview em Tempo Real -->
         <video id="camera-stream" class="absolute inset-0 w-full h-full object-cover" autoplay playsinline></video>
         
