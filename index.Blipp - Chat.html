@@ -6,7 +6,7 @@
     <title>Blipp - WhatsApp Web G2 PRO</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@1/index.js"></script>
@@ -88,46 +88,14 @@
         }
     </script>
     <style>
-        body { font-family: 'Inter', sans-serif; height: 100vh; height: 100dvh; overflow: hidden; background-color: #dadbd3; }
+        body { font-family: 'Inter', sans-serif; height: 100vh; overflow: hidden; background-color: #dadbd3; }
         .dark body { background-color: #0b141a; }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #ced0d1; }
         .dark ::-webkit-scrollbar-thumb { background: #374045; }
-        .chat-bg { 
-            background-color: #efeae2; 
-            background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); 
-            background-repeat: repeat; 
-            background-attachment: local;
-        }
-        .dark .chat-bg { 
-            background-color: #0b141a; 
-            background-image: linear-gradient(rgba(11, 20, 26, 0.92), rgba(11, 20, 26, 0.92)), url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); 
-        }
-        /* Estilo Exato WhatsApp para Mensagens de Sistema */
-        .system-notice {
-            background-color: #182229;
-            border: 1px solid #202c33;
-            color: #ffd279;
-            font-size: 12.5px;
-            padding: 8px 12px;
-            border-radius: 10px;
-            text-align: center;
-            max-width: 90%;
-            margin: 12px auto;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-            line-height: 1.4;
-        }
-        .date-divider {
-            background-color: #182229;
-            color: #8696a0;
-            font-size: 11px;
-            padding: 5px 12px;
-            border-radius: 8px;
-            margin: 16px auto;
-            text-transform: lowercase;
-            font-weight: 500;
-        }
+        .chat-bg { background-color: #efeae2; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-repeat: repeat; }
+        .dark .chat-bg { background-color: #0b141a; background-image: linear-gradient(rgba(11, 20, 26, 0.9), rgba(11, 20, 26, 0.9)), url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); }
         .bubble-in { border-radius: 0 8px 8px 8px; box-shadow: 0 1px 0.5px rgba(0,0,0,0.1); }
         .bubble-out { border-radius: 8px 0 8px 8px; box-shadow: 0 1px 0.5px rgba(0,0,0,0.1); }
         .pulse-ring { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); animation: pulse 2s infinite; }
@@ -139,31 +107,10 @@
             #main-wrapper main { width: 100vw; position: absolute; left: 100%; transition: transform 0.3s; z-index: 20; }
             #main-wrapper.chat-active aside { transform: translateX(-100%); }
             #main-wrapper.chat-active main { transform: translateX(-100%); }
-            nav { display: none; } 
-            .mobile-bottom-nav { 
-                display: flex !important; 
-                height: 70px !important; /* Compressão máxima da nav inferior */
-                padding-bottom: 15px !important; 
-                align-items: center !important;
-                background-color: white !important;
-            }
-            .dark .mobile-bottom-nav { background-color: #202c33 !important; }
-            .mobile-bottom-nav i { width: 18px; height: 18px; }
-            .mobile-bottom-nav span { font-size: 9px !important; margin-top: 2px; }
-            .mobile-fab { 
-                display: flex !important; 
-                bottom: 85px !important; 
-                width: 48px !important; 
-                height: 48px !important; 
-            }
-            /* COMPRESSÃO EXTREMA DO HEADER DA LISTA */
-            #sidebar-header { padding: 4px 10px !important; gap: 4px !important; }
-            #sidebar-title { font-size: 1.1rem !important; margin-bottom: -2px; }
-            #sidebar-header .py-2 { padding-top: 0.3rem !important; padding-bottom: 0.3rem !important; border-radius: 8px !important; } 
-            #sidebar-header .gap-2 { gap: 0.3rem !important; margin-top: -2px; }
-            #sidebar-header button.rounded-full { padding: 2px 10px !important; font-size: 11px !important; } 
-            #sidebar-content .p-3 { padding: 4px 12px !important; } /* Conversas super compactas */
-            #sidebar-content img { width: 42px !important; height: 42px !important; }
+            nav { display: none; } /* Oculta a barra lateral de ícones no mobile */
+            .mobile-bottom-nav { display: flex !important; }
+            .mobile-fab { display: flex !important; }
+            .mobile-filters { display: flex !important; }
         }
 
         .tab-active { color: #008069; background: rgba(0, 128, 105, 0.1); border-radius: 50%; }
@@ -194,27 +141,12 @@
         .dark .media-tab-active { color: #25D366; border-bottom-color: #25D366; }
         .gif-item:hover { transform: scale(1.05); transition: 0.2s; }
 
-        /* Audio & Recording WhatsApp Style */
+        /* Audio & Recording */
         .recording-pulse { animation: pulse-red 1.5s infinite; }
         @keyframes pulse-red { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.2); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
         .audio-wave { display: flex; align-items: center; gap: 2px; height: 20px; }
         .audio-wave span { width: 3px; background: #00a884; border-radius: 10px; animation: wave-anim 1s infinite ease-in-out; }
         @keyframes wave-anim { 0%, 100% { height: 5px; } 50% { height: 15px; } }
-
-        /* Cadeado de Gravação */
-        #recording-lock-ui {
-            position: absolute; bottom: 70px; right: 8px;
-            display: none; flex-direction: column; align-items: center; gap: 8px;
-            background: white; padding: 12px 8px; border-radius: 30px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 100;
-            animation: slideUpLock 0.3s ease-out;
-        }
-        .dark #recording-lock-ui { background: #202c33; border: 1px solid #374045; }
-        @keyframes slideUpLock { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        
-        /* Botão de Gravação Dinâmico */
-        #main-action-btn { transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        #main-action-btn.recording { background-color: #ff3b30; transform: scale(1.2); }
 
         /* Profile & Wallpaper Styles */
         .profile-cover { height: 180px; background-size: cover; background-position: center; position: relative; }
@@ -262,31 +194,6 @@
 
         .reply-box { border-left: 4px solid #00a884; background: rgba(0,0,0,0.05); padding: 5px 8px; border-radius: 4px; margin-bottom: 4px; font-size: 12px; }
         .dark .reply-box { background: rgba(255,255,255,0.05); }
-
-        /* Estilos de Visualização Única */
-        .view-once-bubble { display: flex; align-items: center; gap: 8px; padding: 10px; border-radius: 12px; cursor: pointer; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
-        .view-once-opened { opacity: 0.5; cursor: default; }
-        .view-once-icon { width: 24px; height: 24px; border-radius: 50%; border: 2px dashed currentColor; display: flex; items-center; justify-center; font-size: 10px; font-weight: bold; }
-        
-        /* Menu de Anexos WhatsApp Style PRO */
-        .attachment-menu { 
-            position: absolute; bottom: 75px; left: 15px; 
-            display: none; flex-direction: column-reverse; gap: 12px; 
-            animation: slideUp 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            z-index: 100; padding: 10px;
-        }
-        @keyframes slideUp { from { transform: translateY(30px) scale(0.8); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
-        .attachment-item { 
-            width: 52px; height: 52px; border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; color: white; 
-            cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
-            transition: all 0.2s ease;
-        }
-        .attachment-item:hover { transform: scale(1.15); filter: brightness(1.1); }
-        .attachment-item i { 
-            width: 22px; height: 22px; stroke-width: 2.5px; 
-            display: flex; align-items: center; justify-content: center;
-        }
     </style>
 
 <link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22index.Blipp%20-%20Chat.html%22%2C%22short_name%22%3A%22index.Blipp%20-%20Chat.html%22%2C%22display%22%3A%22standalone%22%2C%22start_url%22%3A%22.%22%2C%22background_color%22%3A%22%230f111a%22%2C%22theme_color%22%3A%22%233b82f6%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fapi.dicebear.com%2F7.x%2Fbottts%2Fsvg%3Fseed%3Dindex.Blipp%2520-%2520Chat.html%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%2C%7B%22src%22%3A%22https%3A%2F%2Fapi.dicebear.com%2F7.x%2Fbottts%2Fsvg%3Fseed%3Dindex.Blipp%2520-%2520Chat.html%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
@@ -294,43 +201,11 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <script>
-let dP;
-window.addEventListener('beforeinstallprompt', e => {
-    e.preventDefault();
-    dP = e;
-    // Criamos o botão flutuante apenas se não estiver em standalone
-    if(!window.matchMedia('(display-mode: standalone)').matches) {
-        const b = document.createElement('button');
-        b.id = "pwa-floating-install";
-        b.innerHTML = '<svg style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;margin-right:6px" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Instalar App';
-        b.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:99999;background:#00a884;color:#fff;border:none;padding:12px 24px;border-radius:50px;font-family:sans-serif;font-weight:600;font-size:14px;box-shadow:0 4px 20px rgba(0,168,132,0.4);cursor:pointer;display:flex;align-items:center;white-space:nowrap;transition:transform 0.2s;';
-        b.onclick = () => window.installBlippApp();
-        document.body.appendChild(b);
-    }
-});
-
-window.installBlippApp = async () => {
-    if (!dP) {
-        if(window.matchMedia('(display-mode: standalone)').matches) {
-            alert("O Blipp já está instalado como aplicação.");
-        } else {
-            alert("A instalação não é suportada neste navegador ou já foi solicitada. Tente usar o Chrome ou Edge.");
-        }
-        return;
-    }
-    dP.prompt();
-    const { outcome } = await dP.userChoice;
-    if (outcome === 'accepted') {
-        const b = document.getElementById('pwa-floating-install');
-        if(b) b.remove();
-    }
-    dP = null;
-};
-
-const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());const isStandalone=()=>('standalone' in window.navigator)||window.matchMedia('(display-mode: standalone)').matches;if(isIos()&&!isStandalone()){const ib=document.createElement('div');ib.innerHTML='Para instalar como App: toque em <b>Compartilhar</b> e depois <b>Adicionar ao Ecrã Principal</b><button style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#a1a1aa;font-size:16px;" onclick="this.parentElement.remove()">✕</button>';ib.style.cssText='position:fixed;bottom:0;left:0;width:100%;background:#1c1e2b;color:#fff;padding:15px 30px 15px 15px;font-family:sans-serif;font-size:12px;text-align:center;z-index:99999;border-top:1px solid #2b2d3a;box-shadow:0 -5px 15px rgba(0,0,0,0.2);';setTimeout(()=>document.body.appendChild(ib),2000);}
+let dP;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dP=e;const b=document.createElement('button');b.innerHTML='<svg style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;margin-right:6px" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Instalar App';b.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:99999;background:#3b82f6;color:#fff;border:none;padding:12px 24px;border-radius:50px;font-family:sans-serif;font-weight:600;font-size:14px;box-shadow:0 4px 20px rgba(59,130,246,0.4);cursor:pointer;display:flex;align-items:center;white-space:nowrap;transition:transform 0.2s;';b.onclick=async()=>{if(!dP)return;dP.prompt();const{outcome}=await dP.userChoice;if(outcome==='accepted')b.remove();dP=null;};document.body.appendChild(b);});
+const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());const isStandalone=()=>('standalone' in window.navigator)&&window.navigator.standalone;if(isIos()&&!isStandalone()){const ib=document.createElement('div');ib.innerHTML='Para instalar como App: toque em <b>Compartilhar</b> e depois <b>Adicionar ao Ecrã Principal</b><button style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#a1a1aa;font-size:16px;" onclick="this.parentElement.remove()">✕</button>';ib.style.cssText='position:fixed;bottom:0;left:0;width:100%;background:#1c1e2b;color:#fff;padding:15px 30px 15px 15px;font-family:sans-serif;font-size:12px;text-align:center;z-index:99999;border-top:1px solid #2b2d3a;box-shadow:0 -5px 15px rgba(0,0,0,0.2);';setTimeout(()=>document.body.appendChild(ib),2000);}
 </script>
 </head>
-<body class="flex items-center justify-center p-0">
+<body class="flex items-center justify-center p-0 lg:p-4">
 
     <!-- CONTENTOR DE NOTIFICAÇÕES -->
     <div id="toast-container"></div>
@@ -394,7 +269,7 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
         </div>
     </div>
 
-    <div id="main-wrapper" class="w-full h-full flex overflow-hidden bg-white dark:bg-wa-darkBg sidebar-active relative">
+    <div id="main-wrapper" class="w-full h-full lg:max-w-[1600px] flex shadow-2xl overflow-hidden bg-white dark:bg-wa-darkBg sidebar-active relative">
         
         <!-- BARRA LATERAL DE ABAS (NAV - DESKTOP) -->
         <nav class="hidden lg:flex w-[64px] bg-wa-bg dark:bg-wa-darkHeader flex-col items-center py-4 justify-between border-r border-gray-300 dark:border-gray-700">
@@ -414,35 +289,35 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
         </nav>
 
         <!-- COLUNA DE LISTAGEM (MOBILE FRIENDLY) -->
-        <aside class="w-full lg:w-[450px] flex flex-col border-r border-gray-300 dark:border-gray-700 bg-white dark:bg-wa-darkBg h-full shrink-0">
-            <!-- Header WhatsApp Style PRO - COMPACTADO -->
-            <header id="sidebar-header" class="p-2 flex flex-col gap-2 border-b dark:border-gray-800">
-                <div class="flex justify-between items-center px-2">
-                    <h1 id="sidebar-title" class="text-xl font-bold text-wa-teal lg:dark:text-white dark:text-wa-teal">WhatsApp</h1>
-                    <div class="flex gap-3 text-gray-500 items-center">
-                        <!-- Botões Desktop Adicionais -->
-                        <button onclick="openNewContactModal()" title="Adicionar Contacto" class="hidden lg:block hover:text-wa-teal transition-colors">
-                            <i data-lucide="user-plus" class="w-5 h-5"></i>
-                        </button>
-                        <button onclick="showAddContactForm(); document.getElementById('new-contact-modal').classList.remove('hidden');" title="Escanear / O Meu QR" class="hidden lg:block hover:text-wa-teal transition-colors">
-                            <i data-lucide="qr-code" class="w-5 h-5"></i>
-                        </button>
-                        
-                        <button class="lg:hidden"><i data-lucide="camera" class="w-5 h-5"></i></button>
-                        <button onclick="openNewGroupModal()" title="Novo Grupo" class="hover:text-wa-teal transition-colors"><i data-lucide="plus" class="w-5 h-5"></i></button>
-                        <button onclick="switchTab('settings')" title="Configurações" class="hidden lg:block hover:text-wa-teal transition-colors"><i data-lucide="settings" class="w-4 h-4"></i></button>
+        <aside class="w-full lg:w-[400px] flex flex-col border-r border-gray-300 dark:border-gray-700 bg-white dark:bg-wa-darkBg h-full shrink-0">
+            <!-- Header WhatsApp Style PRO -->
+            <header id="sidebar-header" class="p-3 flex flex-col gap-4">
+                <div class="flex justify-between items-center px-1">
+                    <h1 id="sidebar-title" class="text-2xl font-bold text-wa-teal lg:dark:text-white dark:text-wa-teal">WhatsApp</h1>
+                    <div class="flex gap-4 text-gray-500">
+                        <button class="lg:hidden"><i data-lucide="camera" class="w-6 h-6"></i></button>
+                        <button onclick="openNewGroupModal()" title="Novo Grupo"><i data-lucide="users" class="w-5 h-5"></i></button>
+                        <button onclick="switchTab('settings')" title="Configurações" class="hidden lg:block"><i data-lucide="settings" class="w-5 h-5"></i></button>
                     </div>
                 </div>
                 
-                <!-- Barra de Pesquisa Compacta -->
-                <div class="flex bg-gray-100 dark:bg-[#202c33] items-center px-3 py-1.5 rounded-lg mx-1 transition-all">
-                    <i data-lucide="search" class="w-4 h-4 text-gray-400 mr-2"></i>
-                    <input type="text" placeholder="Pesquisar" class="bg-transparent border-none outline-none text-[14px] w-full dark:text-white placeholder-gray-500">
+                <!-- Barra de Pesquisa Grande -->
+                <div class="flex bg-gray-100 dark:bg-wa-darkHeader items-center px-4 py-2 rounded-xl mx-1 border border-transparent focus-within:border-wa-teal/30 transition-all">
+                    <i data-lucide="search" class="w-5 h-5 text-gray-400 mr-3"></i>
+                    <input type="text" placeholder="Pesquisar ou começar uma nova conversa" class="bg-transparent border-none outline-none text-[15px] w-full dark:text-white placeholder-gray-500">
                 </div>
 
-                <!-- Filtros Ultra Compactos (DINÂMICOS) -->
-                <div id="filter-bar" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 px-1">
-                    <!-- Gerado via JS -->
+                <!-- Categorias e Filtros com botão de Nova Lista -->
+                <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 px-1">
+                    <button class="bg-wa-teal/10 text-wa-teal px-4 py-1 rounded-full text-[13px] font-semibold whitespace-nowrap active:scale-95 transition-transform">Todas</button>
+                    <button class="bg-gray-100 dark:bg-gray-800 text-gray-500 px-4 py-1 rounded-full text-[13px] font-semibold whitespace-nowrap hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Não lidas</button>
+                    <button class="bg-gray-100 dark:bg-gray-800 text-gray-500 px-4 py-1 rounded-full text-[13px] font-semibold whitespace-nowrap hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Favoritos</button>
+                    <button class="bg-gray-100 dark:bg-gray-800 text-gray-500 px-4 py-1 rounded-full text-[13px] font-semibold whitespace-nowrap hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Grupos</button>
+                    
+                    <!-- BOTÃO NOVA LISTA (IGUAL AO WHATSAPP) -->
+                    <button onclick="createNewListPrompt()" class="bg-gray-100 dark:bg-gray-800 text-gray-500 p-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 shrink-0 transition-all" title="Nova Lista">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                    </button>
                 </div>
             </header>
 
@@ -456,11 +331,11 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
             </button>
 
             <!-- Bottom Navigation Mobile -->
-            <nav class="mobile-bottom-nav hidden lg:hidden border-t dark:border-gray-800 bg-white dark:bg-wa-darkHeader items-center shrink-0">
-                <button onclick="switchTab('chats')" class="mobile-bottom-item flex-1 flex flex-col items-center active"><i data-lucide="message-square"></i><span class="text-[11px]">Conversas</span></button>
-                <button onclick="switchTab('status')" class="mobile-bottom-item flex-1 flex flex-col items-center text-gray-400"><i data-lucide="circle-dashed"></i><span class="text-[11px]">Atualizações</span></button>
-                <button onclick="switchTab('calls')" class="mobile-bottom-item flex-1 flex flex-col items-center text-gray-400"><i data-lucide="phone"></i><span class="text-[11px]">Chamadas</span></button>
-                <button onclick="switchTab('settings')" class="mobile-bottom-item flex-1 flex flex-col items-center text-gray-400"><i data-lucide="settings"></i><span class="text-[11px]">Definições</span></button>
+            <nav class="mobile-bottom-nav hidden lg:hidden h-[75px] border-t dark:border-gray-800 bg-white dark:bg-wa-darkHeader items-center shrink-0">
+                <button onclick="switchTab('chats')" class="mobile-bottom-item flex-1 flex flex-col items-center gap-1 active"><i data-lucide="message-square"></i><span class="text-[11px]">Conversas</span></button>
+                <button onclick="switchTab('status')" class="mobile-bottom-item flex-1 flex flex-col items-center gap-1 text-gray-400"><i data-lucide="circle-dashed"></i><span class="text-[11px]">Atualizações</span></button>
+                <button onclick="switchTab('calls')" class="mobile-bottom-item flex-1 flex flex-col items-center gap-1 text-gray-400"><i data-lucide="phone"></i><span class="text-[11px]">Chamadas</span></button>
+                <button onclick="switchTab('settings')" class="mobile-bottom-item flex-1 flex flex-col items-center gap-1 text-gray-400"><i data-lucide="settings"></i><span class="text-[11px]">Configurações</span></button>
             </nav>
         </aside>
 
@@ -612,135 +487,58 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
                     </div>
                 </header>
 
-                <div id="message-container" class="flex-1 overflow-y-auto p-2 lg:p-4 chat-bg transition-all duration-300">
-                    <!-- O message-area DEVE ser transparente para mostrar o chat-bg -->
-                    <div id="message-area" class="w-full max-w-full mx-auto flex flex-col gap-1.5 bg-transparent"></div>
+                <div id="message-container" class="flex-1 overflow-y-auto p-6 chat-bg">
+                    <div id="message-area" class="max-w-4xl mx-auto flex flex-col gap-2"></div>
                 </div>
 
-                <footer class="bg-transparent p-2 pb-4 sm:pb-2 relative z-50">
+                <footer class="bg-wa-bg dark:bg-wa-darkHeader p-2 relative">
                     <!-- Barra de Resposta -->
-                    <div id="reply-container" class="hidden flex items-center justify-between bg-black/5 dark:bg-[#1d272e] p-3 mb-2 rounded-xl border-l-4 border-wa-green animate-slide-in">
+                    <div id="reply-container" class="hidden flex items-center justify-between bg-black/5 dark:bg-white/5 p-3 mb-2 rounded-lg border-l-4 border-wa-teal animate-slide-in">
                         <div class="flex-1 min-w-0 pr-4">
-                            <p id="reply-title" class="text-xs font-bold text-wa-green"></p>
+                            <p id="reply-title" class="text-xs font-bold text-wa-teal"></p>
                             <p id="reply-text" class="text-sm truncate opacity-70 dark:text-white"></p>
                         </div>
                         <button onclick="cancelReply()"><i data-lucide="x" class="w-4 h-4 text-gray-500"></i></button>
                     </div>
 
                     <!-- MEDIA PICKER CONTAINER -->
-                    <div id="media-container" class="hidden absolute bottom-[80px] left-2 right-2 bg-white dark:bg-wa-darkHeader shadow-2xl rounded-2xl z-50 border border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col h-[380px]">
+                    <div id="media-container" class="hidden absolute bottom-[70px] left-4 right-4 bg-white dark:bg-wa-darkHeader shadow-2xl rounded-xl z-50 border border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col h-[400px]">
                         <div class="flex border-b dark:border-gray-700 text-sm font-bold text-gray-500">
                             <button onclick="switchMediaTab('emoji')" id="m-tab-emoji" class="flex-1 py-3 media-tab-active">EMOJIS</button>
                             <button onclick="switchMediaTab('gif')" id="m-tab-gif" class="flex-1 py-3">GIFS</button>
                             <button onclick="switchMediaTab('sticker')" id="m-tab-sticker" class="flex-1 py-3">FIGURINHAS</button>
                         </div>
-                        <div id="media-content" class="flex-1 overflow-y-auto p-2 bg-wa-bg dark:bg-wa-darkBg"></div>
+                        <div id="media-content" class="flex-1 overflow-y-auto p-2 bg-wa-bg dark:bg-wa-darkBg">
+                            <!-- Conteúdo dinâmico -->
+                        </div>
                     </div>
 
                     <!-- PREVIEW DE FICHEIRO SELECIONADO -->
-                    <div id="file-preview" class="hidden absolute bottom-[80px] left-2 right-2 bg-white dark:bg-wa-darkHeader p-4 rounded-2xl shadow-2xl flex flex-col gap-4 border dark:border-gray-700 z-[110]">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <div id="preview-icon-box" class="p-3 bg-wa-bg dark:bg-wa-darkBg rounded-xl text-wa-teal">
-                                    <i data-lucide="file-text"></i>
-                                </div>
-                                <div class="min-w-0">
-                                    <p id="file-preview-name" class="text-sm font-bold truncate dark:text-white max-w-[200px]"></p>
-                                    <p id="file-preview-size" class="text-xs text-gray-500"></p>
-                                </div>
+                    <div id="file-preview" class="hidden absolute bottom-[70px] left-4 right-4 bg-white dark:bg-wa-darkHeader p-4 rounded-xl shadow-2xl flex items-center justify-between border dark:border-gray-700">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 bg-wa-bg dark:bg-wa-darkBg rounded"><i data-lucide="file-text" class="text-wa-teal"></i></div>
+                            <div class="min-w-0">
+                                <p id="file-preview-name" class="text-sm font-bold truncate dark:text-white"></p>
+                                <p id="file-preview-size" class="text-xs text-gray-500"></p>
                             </div>
-                            <button onclick="cancelFileUpload()" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
-                                <i data-lucide="x" class="text-gray-400"></i>
-                            </button>
                         </div>
-                        <!-- Opções de Envio -->
-                        <div class="flex items-center justify-between border-t dark:border-gray-700 pt-3">
-                            <button id="view-once-toggle" onclick="toggleViewOnce()" class="flex items-center gap-2 text-gray-500 hover:text-wa-teal transition-colors">
-                                <div class="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center text-[10px] font-bold">1</div>
-                                <span class="text-xs font-bold uppercase tracking-wider">Visualização Única</span>
-                            </button>
-                        </div>
+                        <button onclick="cancelFileUpload()"><i data-lucide="x" class="text-gray-400"></i></button>
                     </div>
 
-                    <!-- MENU DE ANEXOS (WHATSAPP CLONE) -->
-                    <div id="attachment-menu" class="attachment-menu">
-                        <!-- Contacto -->
-                        <div onclick="showBlippNotification('Blipp', 'Funcionalidade de contacto brevemente.', 'info')" class="attachment-item bg-[#0eabf4]" title="Contacto">
-                            <i data-lucide="user"></i>
-                        </div>
-                        <!-- Documento -->
-                        <div onclick="triggerFileType('file')" class="attachment-item bg-[#7f66ff]" title="Documento">
-                            <i data-lucide="file-text"></i>
-                        </div>
-                        <!-- Câmara -->
-                        <div onclick="triggerFileType('camera')" class="attachment-item bg-[#ec407a]" title="Câmara">
-                            <i data-lucide="camera"></i>
-                        </div>
-                        <!-- Galeria -->
-                        <div onclick="triggerFileType('image')" class="attachment-item bg-[#bf59cf]" title="Galeria">
-                            <i data-lucide="image"></i>
-                        </div>
-                        <!-- Áudio -->
-                        <div onclick="triggerFileType('audio')" class="attachment-item bg-[#ff9208]" title="Áudio">
-                            <i data-lucide="headphones"></i>
-                        </div>
-                        <!-- Localização -->
-                        <div onclick="showBlippNotification('GPS', 'Partilha de localização brevemente.', 'info')" class="attachment-item bg-[#06cf9c]" title="Localização">
-                            <i data-lucide="map-pin"></i>
-                        </div>
-                    </div>
-
-                    <form id="message-form" class="flex items-center gap-2 px-1 relative">
-                        <!-- UI CADEADO GRAVAÇÃO -->
-                        <div id="recording-lock-ui">
-                            <i data-lucide="lock" class="w-4 h-4 text-gray-400"></i>
-                            <div class="w-1 h-8 bg-gray-100 dark:bg-gray-800 rounded-full relative overflow-hidden">
-                                <div id="lock-progress" class="absolute bottom-0 left-0 right-0 bg-wa-teal transition-all" style="height: 0%"></div>
+                    <form id="message-form" class="flex items-center gap-2">
+                        <button type="button" onclick="toggleMediaPicker()" class="p-2 text-gray-500 hover:text-wa-teal"><i data-lucide="smile" class="w-6 h-6"></i></button>
+                        <button type="button" onclick="document.getElementById('file-input').click()" class="p-2 text-gray-500 hover:text-wa-teal"><i data-lucide="paperclip" class="w-6 h-6"></i></button>
+                        <input type="file" id="file-input" class="hidden" onchange="handleFileSelection(this)">
+                        
+                        <div id="input-container" class="flex-1 flex items-center bg-white dark:bg-[#2a3942] rounded-lg">
+                            <input id="message-input" type="text" placeholder="Escreva uma mensagem" class="flex-1 p-2.5 bg-transparent dark:text-white outline-none">
+                            <div id="recording-status" class="hidden px-3 flex items-center gap-2 text-red-500">
+                                <span class="recording-pulse w-2 h-2 bg-red-500 rounded-full"></span>
+                                <span id="recording-timer" class="text-sm font-mono">00:00</span>
                             </div>
                         </div>
 
-                        <!-- Input Estilo Cápsula WhatsApp -->
-                        <div id="input-capsule" class="flex-1 flex items-center bg-white dark:bg-[#2a3942] rounded-full shadow-sm px-2 overflow-hidden border border-transparent focus-within:border-gray-300 dark:focus-within:border-gray-600 transition-all">
-                            <button type="button" onclick="toggleMediaPicker()" class="p-2 text-[#8696a0] hover:text-[#54656f] transition-colors"><i data-lucide="smile" class="w-6 h-6"></i></button>
-                            
-                            <input id="message-input" type="text" placeholder="Mensagem" class="flex-1 py-3 px-1 bg-transparent dark:text-white outline-none text-[16px] placeholder-[#8696a0]">
-                            
-                            <div id="recording-status" class="hidden px-2 flex items-center gap-3 flex-1 overflow-hidden">
-                                <!-- Botão Lixeira (Cancelar) -->
-                                <button type="button" onclick="cancelRecording()" class="p-2 text-[#8696a0] hover:text-red-500 transition-colors">
-                                    <i data-lucide="trash-2" class="w-5 h-5"></i>
-                                </button>
-                                
-                                <!-- Cronómetro / Status -->
-                                <div id="recording-info" class="flex items-center gap-2 min-w-[60px]">
-                                    <span id="recording-dot" class="recording-pulse w-2.5 h-2.5 bg-red-500 rounded-full"></span>
-                                    <span id="recording-timer" class="text-[15px] font-medium text-gray-700 dark:text-white">0:00</span>
-                                </div>
-
-                                <!-- Visualizador de Onda Estático -->
-                                <div id="waveform" class="flex-1 flex items-center justify-center gap-[2px] opacity-40">
-                                    <div class="waveform-bar" style="height: 12px"></div><div class="waveform-bar" style="height: 18px"></div><div class="waveform-bar" style="height: 10px"></div><div class="waveform-bar" style="height: 22px"></div><div class="waveform-bar" style="height: 14px"></div><div class="waveform-bar" style="height: 20px"></div><div class="waveform-bar" style="height: 12px"></div><div class="waveform-bar" style="height: 18px"></div><div class="waveform-bar" style="height: 10px"></div><div class="waveform-bar" style="height: 16px"></div><div class="waveform-bar" style="height: 14px"></div>
-                                </div>
-
-                                <!-- Botão de Playback (Apenas no Review Mode) -->
-                                <button type="button" id="preview-play-btn" onclick="window.togglePreviewPlayback()" class="hidden p-2 text-wa-teal active:scale-90 transition-transform">
-                                    <i data-lucide="play" class="w-5 h-5 fill-current"></i>
-                                </button>
-
-                                <!-- Botão Parar Gravação (Manual) -->
-                                <button type="button" id="stop-record-btn" onclick="window.stopRecordingProcess(false)" class="p-2 text-red-500 active:scale-90 transition-transform">
-                                    <i data-lucide="pause" class="w-5 h-5 fill-current"></i>
-                                </button>
-                            </div>
-
-                            <button type="button" onclick="toggleAttachmentMenu(event)" class="p-2 text-[#8696a0] -rotate-45 hover:text-[#54656f] transition-colors"><i data-lucide="paperclip" class="w-6 h-6"></i></button>
-                            <input type="file" id="universal-file-input" class="hidden" onchange="handleFileSelection(this)">
-                            <button type="button" onclick="triggerFileType('camera')" class="p-2 text-[#8696a0] hover:text-[#54656f] transition-colors"><i data-lucide="camera" class="w-6 h-6"></i></button>
-                        </div>
-
-                        <!-- BOTÃO DE AÇÃO UNIFICADO (Voz e Texto) -->
-                        <button type="button" id="main-action-btn" 
-                                class="w-12 h-12 flex items-center justify-center bg-[#00a884] text-white rounded-full shadow-lg shrink-0 transition-all">
+                        <button type="submit" id="main-action-btn" class="p-2 text-wa-teal">
                             <i data-lucide="mic" id="icon-mic" class="w-6 h-6"></i>
                             <i data-lucide="send" id="icon-send" class="hidden w-6 h-6"></i>
                         </button>
@@ -939,135 +737,23 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
         </div>
     </div>
 
-    <!-- CAMERA MODAL (BLIPP STUDIO) - WHATSAPP PIXEL-PERFECT -->
-    <div id="camera-modal" class="hidden fixed inset-0 z-[5000] bg-black flex flex-col items-center justify-center">
-        <!-- Preview em Tempo Real -->
-        <video id="camera-stream" class="absolute inset-0 w-full h-full object-cover" autoplay playsinline muted></video>
-        
-        <!-- Foto Capturada ou Vídeo Gravado (Preview) -->
-        <canvas id="camera-canvas" class="hidden absolute inset-0 w-full h-full object-cover"></canvas>
-        <video id="video-review" class="hidden absolute inset-0 w-full h-full object-cover" controls playsinline loop></video>
-
-        <div class="camera-overlay">
-            <!-- Camada Superior (Controles) -->
-            <div class="p-6 flex justify-between items-center w-full bg-gradient-to-b from-black/50 to-transparent">
-                <button onclick="window.closeCamera()" class="text-white drop-shadow-md"><i data-lucide="x" class="w-7 h-7"></i></button>
-                <div class="flex gap-6 items-center">
-                    <button id="cam-flash-toggle" class="text-white"><i data-lucide="zap-off" class="w-6 h-6"></i></button>
-                    <div id="camera-edit-tools" class="hidden flex gap-4">
-                        <button id="cam-view-once" onclick="window.toggleCameraViewOnce()" class="w-9 h-9 rounded-full border-2 border-white text-white flex items-center justify-center font-bold text-xs">1</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Camada Inferior (Galeria, Shutter, Modos) -->
-            <div class="cam-bottom-nav flex flex-col items-center w-full mt-auto">
-                
-                <!-- Thumbnails Recentes (Simulados conforme Imagem) -->
-                <div id="cam-recent-bar" class="w-full flex gap-1.5 px-2 mb-6 overflow-x-auto no-scrollbar">
-                    <img src="https://picsum.photos/seed/wa1/100/100" class="recent-thumb">
-                    <img src="https://picsum.photos/seed/wa2/100/100" class="recent-thumb">
-                    <img src="https://picsum.photos/seed/wa3/100/100" class="recent-thumb">
-                    <img src="https://picsum.photos/seed/wa4/100/100" class="recent-thumb">
-                    <img src="https://picsum.photos/seed/wa5/100/100" class="recent-thumb">
-                    <img src="https://picsum.photos/seed/wa6/100/100" class="recent-thumb">
-                </div>
-
-                <!-- Controlos de Disparo -->
-                <div class="flex items-center justify-between w-full max-w-sm px-8 mb-8">
-                    <!-- Abrir Galeria -->
-                    <button onclick="document.getElementById('universal-file-input').click()" class="text-white p-3 rounded-full bg-black/20 backdrop-blur-sm">
-                        <i data-lucide="image" class="w-7 h-7"></i>
-                    </button>
-                    
-                    <!-- Filtros (Varinha Mágica) -->
-                    <button onclick="document.getElementById('camera-filters').classList.toggle('hidden')" class="text-white p-3 rounded-full bg-black/20 backdrop-blur-sm">
-                        <i data-lucide="wand-2" class="w-6 h-6"></i>
-                    </button>
-
-                    <!-- OBTURADOR -->
-                    <div class="relative">
-                        <div id="video-timer" class="hidden absolute -top-14 left-1/2 -translate-x-1/2 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold font-mono">00:00</div>
-                        <button id="shutter-btn" onclick="window.handleCamAction()" class="shutter-btn">
-                            <div class="shutter-inner"></div>
-                        </button>
-                    </div>
-
-                    <!-- Inverter Câmara -->
-                    <button onclick="window.switchCameraSource()" class="text-white p-3 rounded-full bg-black/20 backdrop-blur-sm">
-                        <i data-lucide="refresh-cw" class="w-7 h-7"></i>
-                    </button>
-
-                    <!-- Botão de Envio (Apenas em Review) -->
-                    <button id="cam-send-media" onclick="window.sendCapturedMedia()" class="hidden w-16 h-16 rounded-full bg-[#00a884] text-white flex items-center justify-center shadow-2xl scale-110">
-                        <i data-lucide="send" class="w-8 h-8"></i>
-                    </button>
-                </div>
-
-                <!-- Seletor de Modo Texto (WhatsApp Style) -->
-                <div id="cam-mode-selector" class="flex gap-8 items-center mb-2">
-                    <span onclick="window.setCamMode('video')" id="mode-video" class="cam-mode-label">Vídeo</span>
-                    <span onclick="window.setCamMode('photo')" id="mode-photo" class="cam-mode-label active">Foto</span>
-                    <span onclick="window.setCamMode('video-msg')" id="mode-video-msg" class="cam-mode-label">Recado de vídeo</span>
-                </div>
-
-                <!-- Barra de Filtros (Pop-up) -->
-                <div id="camera-filters" class="hidden w-full overflow-x-auto no-scrollbar flex gap-3 px-4 py-4 bg-black/60 backdrop-blur-xl absolute bottom-40 border-y border-white/10">
-                    <button onclick="window.applyCamFilter('none')" class="filter-chip active">Original</button>
-                    <button onclick="window.applyCamFilter('grayscale(100%)')" class="filter-chip">P&B</button>
-                    <button onclick="window.applyCamFilter('sepia(100%)')" class="filter-chip">Sépia</button>
-                    <button onclick="window.applyCamFilter('brightness(150%)')" class="filter-chip">Brilho</button>
-                    <button onclick="window.applyCamFilter('contrast(200%)')" class="filter-chip">Contraste</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- AUTH OVERLAY -->
-    <div id="auth-container" class="fixed inset-0 z-[1000] flex items-center justify-center bg-wa-bg dark:bg-wa-darkBg p-4">
-        <div class="w-full max-w-md text-center">
-            <div class="flex flex-col items-center mb-8">
-                <img src="https://static.whatsapp.net/rsrc.php/v3/y6/r/wa669ae5dbc.png" class="w-16 mb-4">
-                <h2 class="text-2xl font-bold dark:text-white">Blipp Web G2</h2>
-                <p class="text-gray-500 text-sm">A sua comunicação, elevada ao nível supremo.</p>
-            </div>
-
-            <div class="bg-white dark:bg-wa-darkHeader p-8 rounded-2xl shadow-2xl border dark:border-gray-800">
-                <!-- FORMULÁRIO DE LOGIN -->
+    <div id="auth-container" class="fixed inset-0 z-[1000] flex items-center justify-center bg-wa-bg dark:bg-wa-darkBg">
+        <div class="w-full max-w-sm text-center">
+            <img src="https://static.whatsapp.net/rsrc.php/v3/y6/r/wa669ae5dbc.png" class="w-20 mx-auto mb-10">
+            <div class="bg-white dark:bg-wa-darkHeader p-8 rounded-xl shadow-xl">
                 <form id="login-form" class="space-y-4">
-                    <h3 class="text-xl font-bold dark:text-white mb-6">Entrar na Conta</h3>
-                    <input type="email" id="login-email" placeholder="Endereço de Email" class="w-full p-4 rounded-xl bg-gray-50 dark:bg-wa-darkBg dark:text-white border border-transparent focus:border-wa-teal outline-none transition-all" required>
-                    <input type="password" id="login-password" placeholder="Palavra-passe" class="w-full p-4 rounded-xl bg-gray-50 dark:bg-wa-darkBg dark:text-white border border-transparent focus:border-wa-teal outline-none transition-all" required>
-                    <button type="submit" class="w-full bg-wa-teal text-white py-4 rounded-xl font-bold hover:bg-wa-green shadow-lg transition-all active:scale-95">ENTRAR</button>
-                    <p class="mt-6 text-sm text-gray-500">
-                        Não tem uma conta? 
-                        <button type="button" onclick="toggleAuthMode('register')" class="text-wa-teal font-bold hover:underline">Registe-se agora</button>
-                    </p>
+                    <input type="email" id="login-email" placeholder="Email" class="w-full p-4 rounded-lg bg-gray-100 dark:bg-wa-darkBg dark:text-white outline-none">
+                    <input type="password" id="login-password" placeholder="Palavra-passe" class="w-full p-4 rounded-lg bg-gray-100 dark:bg-wa-darkBg dark:text-white outline-none">
+                    <button type="submit" class="w-full bg-wa-teal text-white py-4 rounded-lg font-bold hover:bg-wa-green transition-all">ENTRAR</button>
                 </form>
-
-                <!-- FORMULÁRIO DE REGISTO -->
-                <form id="register-form" class="hidden space-y-4">
-                    <h3 class="text-xl font-bold dark:text-white mb-6">Criar Nova Conta</h3>
-                    <input type="text" id="reg-name" placeholder="O seu Nome Completo" class="w-full p-4 rounded-xl bg-gray-50 dark:bg-wa-darkBg dark:text-white border border-transparent focus:border-wa-teal outline-none transition-all" required>
-                    <input type="email" id="reg-email" placeholder="Endereço de Email" class="w-full p-4 rounded-xl bg-gray-50 dark:bg-wa-darkBg dark:text-white border border-transparent focus:border-wa-teal outline-none transition-all" required>
-                    <input type="password" id="reg-password" placeholder="Defina uma Palavra-passe" class="w-full p-4 rounded-xl bg-gray-50 dark:bg-wa-darkBg dark:text-white border border-transparent focus:border-wa-teal outline-none transition-all" required>
-                    <button type="submit" class="w-full bg-[#00a884] text-white py-4 rounded-xl font-bold hover:bg-wa-green shadow-lg transition-all active:scale-95">CRIAR CONTA</button>
-                    <p class="mt-6 text-sm text-gray-500">
-                        Já tem conta? 
-                        <button type="button" onclick="toggleAuthMode('login')" class="text-wa-teal font-bold hover:underline">Inicie sessão</button>
-                    </p>
-                </form>
-            </div>
-            <div class="mt-8 flex items-center justify-center gap-2 text-gray-400 text-xs">
-                <i data-lucide="lock" class="w-3 h-3"></i>
-                Criptografia de ponta a ponta por COD SOLUTIONS
             </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, doc, getDoc, getDocs, setDoc, updateDoc, onSnapshot, collection, query, orderBy, addDoc, serverTimestamp, where, arrayUnion, arrayRemove, deleteField } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
         window.deleteField = deleteField; // Tornar global para as funções window.
 
@@ -1083,11 +769,8 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        window.auth = auth;
-        window.db = db;
 
         let currentUser = null, activeChatUser = null, activeChatId = null, unsubMessages = null, currentTab = 'chats';
-        let currentFilter = 'all'; // all, unread, favorites, groups, or listName
         let localStream = null, pc = null, isMicMuted = false, isVideoOff = false, isSpeakerOff = false;
         let currentCallId = null, callListenerUnsub = null, incomingCallType = null;
         const iceConfig = { iceServers: [{ urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }] };
@@ -1096,512 +779,68 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
         const getSettings = () => JSON.parse(localStorage.getItem('blipp_settings') || '{"callSounds":true, "msgSounds":true, "msgPreview":true, "notifSound":"https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3"}');
         const saveSettings = (s) => localStorage.setItem('blipp_settings', JSON.stringify(s));
         let mediaRecorder = null, audioChunks = [], recordTimer = null, secondsElapsed = 0;
-        let selectedFile = null, isViewOnce = false;
-        let cameraStreamObj = null, camCapturedBlob = null, camFilter = 'none', camViewOnce = false;
-        let camMode = 'photo', camVideoRecorder = null, camVideoChunks = [], camVideoTimer = null;
+        let selectedFile = null;
         let sidebarUnsub = null;
 
         lucide.createIcons();
 
-        // LÓGICA DE ÁUDIO UNIFICADA SUPREMA (WHATSAPP CLONE)
+        // LÓGICA DE ÁUDIO E UI DINÂMICA
         const messageInput = document.getElementById('message-input');
-        const mainActionBtn = document.getElementById('main-action-btn');
         const iconMic = document.getElementById('icon-mic');
         const iconSend = document.getElementById('icon-send');
-        const lockUI = document.getElementById('recording-lock-ui');
-        const lockProgress = document.getElementById('lock-progress');
 
-        let isRecording = false;
-        let isLocked = false;
-        let startY = 0;
-        let recordCancelled = false;
-        let recordedAudioBlob = null; 
-        let previewAudioObj = null; 
-        let isReviewMode = false; // Novo estado de controlo
-
-        // Alternar Ícone por Input de Texto
         messageInput.addEventListener('input', () => {
-            const hasText = messageInput.value.trim().length > 0 || selectedFile !== null;
-            if(hasText) {
-                iconMic.classList.add('hidden');
-                iconSend.classList.remove('hidden');
-            } else {
-                iconMic.classList.remove('hidden');
-                iconSend.classList.add('hidden');
-            }
+            const hasText = messageInput.value.trim().length > 0;
+            iconMic.classList.toggle('hidden', hasText);
+            iconSend.classList.toggle('hidden', !hasText);
         });
 
-        // Efeito de Hover: Trocar para Mic se estiver vazio (Feedback Visual)
-        mainActionBtn.addEventListener('mouseenter', () => {
-            if(messageInput.value.trim().length === 0 && !selectedFile) {
-                iconMic.classList.remove('hidden');
-                iconSend.classList.add('hidden');
-            }
-        });
+        window.toggleRecording = async () => {
+            if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
 
-        // GESTÃO DE EVENTOS (MOUSE E TOUCH)
-        const startAction = (e) => {
-            const hasText = messageInput.value.trim().length > 0 || selectedFile !== null;
-            
-            // Se estiver em modo de revisão, o botão principal apenas envia o buffer guardado
-            if (isReviewMode && recordedAudioBlob) {
-                window.sendRecordedAudio();
-                return;
-            }
+                    mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
+                    
+                    mediaRecorder.onstop = async () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        const audioFile = new File([audioBlob], `audio_${Date.now()}.webm`, { type: 'audio/webm' });
+                        
+                        showBlippNotification("Blipp Áudio", "A enviar mensagem de voz...", "info");
+                        try {
+                            const url = await window.uploadFileToR2(audioFile, 'audios');
+                            await addDoc(collection(db, 'chats', activeChatId, 'messages'), {
+                                senderId: currentUser.uid,
+                                text: '',
+                                mediaUrl: url,
+                                mediaType: 'audio',
+                                timestamp: serverTimestamp()
+                            });
+                        } catch (err) {
+                            console.error(err);
+                            showBlippNotification("Erro", "Falha ao enviar áudio.", "error");
+                        }
+                    };
 
-            if (hasText) {
-                document.getElementById('message-form').dispatchEvent(new Event('submit'));
-            } else {
-                // Prevenir gravação se já houver texto ou se já estiver a gravar (multi-click)
-                if (isRecording) return;
-                startY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
-                startRecordingProcess();
-            }
-        };
-
-        const moveAction = (e) => {
-            if (!isRecording || isLocked) return;
-            const currentY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
-            const diffY = startY - currentY;
-            const threshold = 60; // Distância para bloquear
-
-            if (diffY > 10) {
-                lockUI.style.display = 'flex';
-                const percent = Math.min((diffY / threshold) * 100, 100);
-                lockProgress.style.height = `${percent}%`;
-            }
-
-            if (diffY >= threshold) {
-                lockRecording();
-            }
-        };
-
-        const endAction = () => {
-            if (isRecording && !isLocked) {
-                stopRecordingProcess(false);
-            }
-        };
-
-        mainActionBtn.addEventListener('mousedown', startAction);
-        mainActionBtn.addEventListener('touchstart', startAction, { passive: true });
-        window.addEventListener('mousemove', moveAction);
-        window.addEventListener('touchmove', moveAction, { passive: true });
-        window.addEventListener('mouseup', endAction);
-        window.addEventListener('touchend', endAction);
-
-        async function startRecordingProcess() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream);
-                audioChunks = [];
-                recordCancelled = false;
-                recordedAudioBlob = null;
-
-                mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
-                mediaRecorder.onstop = async () => {
-                    if (recordCancelled) return;
-                    // Em vez de enviar, guardamos no buffer para revisão
-                    recordedAudioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                    enterReviewMode();
-                };
-
-                mediaRecorder.start();
-                isRecording = true;
-                startTimer();
-                
-                mainActionBtn.classList.add('recording');
-                document.getElementById('recording-status').classList.remove('hidden');
-                document.getElementById('input-capsule').classList.add('bg-red-50/50', 'dark:bg-red-900/10');
-                messageInput.classList.add('hidden');
-                iconMic.classList.add('recording-pulse');
-            } catch (err) {
-                showBlippNotification("Erro", "Sem acesso ao microfone.", "error");
-            }
-        }
-
-        function lockRecording() {
-            isLocked = true;
-            lockUI.innerHTML = '<i data-lucide="lock" class="text-wa-teal w-5 h-5"></i>';
-            lucide.createIcons();
-            showBlippNotification("Voz", "Cadeado ativado. Pare a gravação para revisar.", "info");
-        }
-
-        window.stopRecordingProcess = (cancelled = false) => {
-            if (!isRecording) return;
-            recordCancelled = cancelled;
-            
-            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-                mediaRecorder.stop();
-                mediaRecorder.stream.getTracks().forEach(t => t.stop());
-            }
-
-            isRecording = false;
-            isLocked = false;
-            stopTimer();
-
-            if (cancelled) {
-                resetInputUI();
-            }
-        };
-
-        function enterReviewMode() {
-            isReviewMode = true;
-            // UI Transition: O botão principal torna-se o botão de ENVIO FINAL
-            mainActionBtn.classList.remove('recording');
-            mainActionBtn.classList.add('bg-[#00a884]');
-            iconMic.classList.add('hidden');
-            iconSend.classList.remove('hidden');
-            
-            // Esconder o botão de pausa/stop e mostrar o botão de reproduzir a prévia
-            document.getElementById('stop-record-btn').classList.add('hidden');
-            document.getElementById('preview-play-btn').classList.remove('hidden');
-            
-            // UI Visual: Parar animações de gravação ativa
-            document.getElementById('recording-dot').classList.add('hidden');
-            document.getElementById('recording-timer').classList.add('text-wa-teal');
-            document.getElementById('waveform').classList.replace('opacity-40', 'opacity-100');
-            
-            lucide.createIcons();
-            showBlippNotification("Blipp Áudio", "Ouvir prévia ou enviar.", "info");
-        }
-
-        window.togglePreviewPlayback = () => {
-            if (!recordedAudioBlob) return;
-            
-            if (previewAudioObj && !previewAudioObj.paused) {
-                previewAudioObj.pause();
-                updatePreviewBtnIcon(false);
-            } else {
-                if (!previewAudioObj) {
-                    const url = URL.createObjectURL(recordedAudioBlob);
-                    previewAudioObj = new Audio(url);
-                    previewAudioObj.onended = () => updatePreviewBtnIcon(false);
+                    mediaRecorder.start();
+                    startTimer();
+                    document.getElementById('recording-status').classList.remove('hidden');
+                    messageInput.classList.add('hidden');
+                    iconMic.classList.add('text-red-500', 'recording-pulse');
+                    iconMic.setAttribute('data-lucide', 'square');
+                    lucide.createIcons();
+                } catch (err) {
+                    const msg = err.name === 'NotAllowedError' ? "Permissão negada. Ative o microfone nas definições do navegador." : "Erro ao aceder ao microfone.";
+                    showBlippNotification("Erro Microfone", msg, "error");
                 }
-                previewAudioObj.play();
-                updatePreviewBtnIcon(true);
+            } else {
+                stopRecording();
             }
         };
-
-        function updatePreviewBtnIcon(isPlaying) {
-            const btn = document.getElementById('preview-play-btn');
-            btn.innerHTML = `<i data-lucide="${isPlaying ? 'pause' : 'play'}" class="w-5 h-5 fill-current"></i>`;
-            lucide.createIcons();
-        }
-
-        window.sendRecordedAudio = async () => {
-            if (!recordedAudioBlob || !activeChatId) return;
-
-            const audioFile = new File([recordedAudioBlob], `audio_${Date.now()}.webm`, { type: 'audio/webm' });
-            
-            showBlippNotification("Cloud R2", "A processar áudio...", "info");
-            
-            try {
-                const url = await window.uploadFileToR2(audioFile, 'audios');
-                await addDoc(collection(db, 'chats', activeChatId, 'messages'), {
-                    senderId: currentUser.uid,
-                    text: '', mediaUrl: url, mediaType: 'audio', timestamp: serverTimestamp()
-                });
-                resetInputUI();
-            } catch (err) {
-                showBlippNotification("Erro R2", "Falha ao enviar áudio.", "error");
-            }
-        };
-
-        function resetInputUI() {
-            if (previewAudioObj) {
-                previewAudioObj.pause();
-                previewAudioObj = null;
-            }
-            recordedAudioBlob = null;
-            recordCancelled = false;
-            isRecording = false;
-            isLocked = false;
-            isReviewMode = false;
-            
-            mainActionBtn.classList.remove('recording');
-            mainActionBtn.classList.remove('bg-[#00a884]'); // Remove cor se estava em review
-            
-            document.getElementById('recording-status').classList.add('hidden');
-            document.getElementById('stop-record-btn').classList.remove('hidden');
-            document.getElementById('preview-play-btn').classList.add('hidden');
-            document.getElementById('recording-dot').classList.remove('hidden');
-            document.getElementById('recording-timer').classList.remove('text-wa-teal');
-            document.getElementById('waveform').classList.add('opacity-40');
-            document.getElementById('waveform').classList.remove('opacity-100');
-            
-            document.getElementById('input-capsule').classList.remove('bg-red-50/50', 'dark:bg-red-900/10');
-            messageInput.classList.remove('hidden');
-            messageInput.value = '';
-            
-            // Voltar ao ícone de microfone (estado inicial)
-            iconMic.classList.remove('hidden', 'recording-pulse');
-            iconSend.classList.add('hidden');
-            
-            lockUI.style.display = 'none';
-            lockUI.innerHTML = '<i data-lucide="lock" class="w-4 h-4 text-gray-400"></i><div class="w-1 h-8 bg-gray-100 dark:bg-gray-800 rounded-full relative overflow-hidden"><div id="lock-progress" class="absolute bottom-0 left-0 right-0 bg-wa-teal transition-all" style="height: 0%"></div></div>';
-            
-            lucide.createIcons();
-        }
-
-        // (Removido duplicado - a lógica consolidada está acima na seção de Hardware)
 
         // LÓGICA DE FICHEIROS (PAPERCLIP)
-        window.toggleAttachmentMenu = (e) => {
-            e.stopPropagation();
-            const menu = document.getElementById('attachment-menu');
-            const isHidden = menu.style.display !== 'flex';
-            menu.style.display = isHidden ? 'flex' : 'none';
-            if(isHidden) {
-                document.addEventListener('click', () => menu.style.display = 'none', { once: true });
-            }
-        };
-
-        window.triggerFileType = (type) => {
-            if(type === 'camera') {
-                window.openCamera();
-                return;
-            }
-            const input = document.getElementById('universal-file-input');
-            input.setAttribute('accept', '');
-            if(type === 'image') input.setAttribute('accept', 'image/*,video/*');
-            else if(type === 'audio') input.setAttribute('accept', 'audio/*');
-            input.click();
-        };
-
-        // BLIPP CAMERA STUDIO 2.0 - SUPORTE FOTO E VÍDEO
-        window.openCamera = async () => {
-            const modal = document.getElementById('camera-modal');
-            const video = document.getElementById('camera-stream');
-            
-            try {
-                // Solicitar câmara e áudio para suportar gravação de vídeo
-                cameraStreamObj = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } }, 
-                    audio: true 
-                });
-                video.srcObject = cameraStreamObj;
-                modal.classList.remove('hidden');
-                window.resetCamera();
-                lucide.createIcons();
-            } catch (err) {
-                showBlippNotification("Erro Studio", "Sem permissão para câmara ou microfone.", "error");
-            }
-        };
-
-        window.setCamMode = (mode) => {
-            if (camVideoRecorder && camVideoRecorder.state === 'recording') return;
-            camMode = (mode === 'video-msg') ? 'video' : mode; // Map video-msg to video logic
-            
-            // UI Toggle para as labels de texto
-            document.querySelectorAll('.cam-mode-label').forEach(el => el.classList.remove('active'));
-            const activeLabel = document.getElementById(`mode-${mode}`);
-            if(activeLabel) activeLabel.classList.add('active');
-            
-            // Shutter Style
-            const shutter = document.getElementById('shutter-btn');
-            const inner = shutter.querySelector('.shutter-inner');
-            
-            if (camMode === 'video') {
-                shutter.style.borderColor = 'rgba(255, 59, 48, 0.4)';
-                inner.style.backgroundColor = '#ff3b30';
-            } else {
-                shutter.style.borderColor = 'white';
-                inner.style.backgroundColor = 'white';
-            }
-            lucide.createIcons();
-        };
-
-        window.switchCameraSource = async () => {
-            if (cameraStreamObj) {
-                cameraStreamObj.getTracks().forEach(t => t.stop());
-            }
-            // Simulação de alternância entre front e back camera
-            const currentFacing = cameraStreamObj?.getVideoTracks()[0].getSettings().facingMode;
-            const newFacing = (currentFacing === 'user') ? 'environment' : 'user';
-            
-            try {
-                cameraStreamObj = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: newFacing, width: { ideal: 1280 }, height: { ideal: 720 } }, 
-                    audio: true 
-                });
-                document.getElementById('camera-stream').srcObject = cameraStreamObj;
-                showBlippNotification("Câmara", "Alternando visão...", "info");
-            } catch(e) {
-                showBlippNotification("Erro", "Não foi possível inverter a câmara.", "error");
-            }
-        };
-
-        window.handleCamAction = () => {
-            if (camMode === 'photo') {
-                takePhoto();
-            } else {
-                if (!camVideoRecorder || camVideoRecorder.state === 'inactive') {
-                    startVideoRecording();
-                } else {
-                    stopVideoRecording();
-                }
-            }
-        };
-
-        function takePhoto() {
-            const video = document.getElementById('camera-stream');
-            const canvas = document.getElementById('camera-canvas');
-            const ctx = canvas.getContext('2d');
-            
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            ctx.filter = camFilter;
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            
-            video.classList.add('hidden');
-            canvas.classList.remove('hidden');
-            enterCamReviewMode('image');
-        }
-
-        function startVideoRecording() {
-            camVideoChunks = [];
-            // Verificar suporte de codec para máxima compatibilidade mobile/desktop
-            const options = { mimeType: 'video/webm;codecs=vp8,opus' };
-            if (!MediaRecorder.isTypeSupported(options.mimeType)) options.mimeType = 'video/mp4';
-            
-            camVideoRecorder = new MediaRecorder(cameraStreamObj, options);
-            camVideoRecorder.ondataavailable = (e) => { if(e.data.size > 0) camVideoChunks.push(e.data); };
-            
-            camVideoRecorder.onstop = () => {
-                const blob = new Blob(camVideoChunks, { type: options.mimeType });
-                camCapturedBlob = blob;
-                const url = URL.createObjectURL(blob);
-                const review = document.getElementById('video-review');
-                review.src = url;
-                review.classList.remove('hidden');
-                document.getElementById('camera-stream').classList.add('hidden');
-                enterCamReviewMode('video');
-            };
-
-            camVideoRecorder.start();
-            
-            // UI FeedBack
-            document.getElementById('shutter-btn').classList.add('recording');
-            document.getElementById('video-timer').classList.remove('hidden');
-            document.getElementById('cam-mode-selector').classList.add('opacity-0', 'pointer-events-none');
-            showBlippNotification("Gravando", "O áudio também está a ser capturado.", "info");
-            
-            let secs = 0;
-            camVideoTimer = setInterval(() => {
-                secs++;
-                const m = Math.floor(secs / 60).toString().padStart(2, '0');
-                const s = (secs % 60).toString().padStart(2, '0');
-                document.getElementById('video-timer').textContent = `${m}:${s}`;
-            }, 1000);
-        }
-
-        function stopVideoRecording() {
-            if (camVideoRecorder) camVideoRecorder.stop();
-            clearInterval(camVideoTimer);
-            document.getElementById('shutter-btn').classList.remove('recording');
-            document.getElementById('video-timer').classList.add('hidden');
-            document.getElementById('video-timer').textContent = "00:00";
-        }
-
-        function enterCamReviewMode(type) {
-            document.getElementById('camera-filters').classList.toggle('hidden', type !== 'image');
-            document.getElementById('camera-edit-tools').classList.remove('hidden');
-            document.getElementById('shutter-btn').classList.add('hidden');
-            document.getElementById('cam-mode-selector').classList.add('hidden');
-            document.getElementById('cam-cancel-media').classList.remove('hidden');
-            document.getElementById('cam-send-media').classList.remove('hidden');
-            lucide.createIcons();
-        }
-
-        window.applyCamFilter = (filter) => {
-            camFilter = filter;
-            const canvas = document.getElementById('camera-canvas');
-            const video = document.getElementById('camera-stream');
-            const ctx = canvas.getContext('2d');
-            ctx.filter = filter;
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            document.querySelectorAll('.filter-chip').forEach(c => c.classList.toggle('active', c.innerText.toLowerCase().includes(filter === 'none' ? 'original' : '')));
-        };
-
-        window.toggleCameraViewOnce = () => {
-            camViewOnce = !camViewOnce;
-            const btn = document.getElementById('cam-view-once');
-            btn.classList.toggle('bg-wa-teal', camViewOnce);
-            btn.classList.toggle('border-wa-teal', camViewOnce);
-        };
-
-        window.resetCamera = () => {
-            const video = document.getElementById('camera-stream');
-            const canvas = document.getElementById('camera-canvas');
-            const review = document.getElementById('video-review');
-            
-            video.classList.remove('hidden');
-            canvas.classList.add('hidden');
-            review.classList.add('hidden');
-            review.src = "";
-            
-            document.getElementById('camera-filters').classList.add('hidden');
-            document.getElementById('camera-edit-tools').classList.add('hidden');
-            document.getElementById('shutter-btn').classList.remove('hidden');
-            document.getElementById('cam-mode-selector').classList.remove('hidden', 'opacity-0', 'pointer-events-none');
-            document.getElementById('cam-cancel-media').classList.add('hidden');
-            document.getElementById('cam-send-media').classList.add('hidden');
-            
-            camFilter = 'none';
-            camCapturedBlob = null;
-            camViewOnce = false;
-            document.getElementById('cam-view-once').classList.remove('bg-wa-teal', 'border-wa-teal');
-        };
-
-        window.closeCamera = () => {
-            if (cameraStreamObj) {
-                cameraStreamObj.getTracks().forEach(t => t.stop());
-                cameraStreamObj = null;
-            }
-            document.getElementById('camera-modal').classList.add('hidden');
-        };
-
-        window.sendCapturedMedia = async () => {
-            showBlippNotification("Studio", "A processar media...", "info");
-            const viewOnce = camViewOnce;
-            let file, type;
-
-            if (camMode === 'photo') {
-                const canvas = document.getElementById('camera-canvas');
-                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.9));
-                file = new File([blob], `blipp_photo_${Date.now()}.jpg`, { type: 'image/jpeg' });
-                type = 'image';
-            } else {
-                file = new File([camCapturedBlob], `blipp_video_${Date.now()}.mp4`, { type: 'video/mp4' });
-                type = 'video';
-            }
-            
-            window.closeCamera();
-            try {
-                const url = await window.uploadFileToR2(file, type + 's');
-                await addDoc(collection(db, 'chats', activeChatId, 'messages'), {
-                    senderId: currentUser.uid,
-                    text: "",
-                    mediaUrl: url,
-                    mediaType: type,
-                    fileName: file.name,
-                    isViewOnce: viewOnce,
-                    viewers: [],
-                    timestamp: serverTimestamp()
-                });
-            } catch (err) {
-                showBlippNotification("Erro R2", "Falha ao enviar captura.", "error");
-            }
-        };
-
-        window.toggleViewOnce = () => {
-            isViewOnce = !isViewOnce;
-            const btn = document.getElementById('view-once-toggle');
-            btn.classList.toggle('text-wa-teal', isViewOnce);
-            btn.classList.toggle('text-gray-500', !isViewOnce);
-            showBlippNotification("Modo", isViewOnce ? "Visualização única ativada." : "Visualização única desativada.", "info");
-        };
-
         window.handleFileSelection = (input) => {
             selectedFile = input.files[0];
             if (!selectedFile) return;
@@ -1609,30 +848,18 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
             const preview = document.getElementById('file-preview');
             const nameDisp = document.getElementById('file-preview-name');
             const sizeDisp = document.getElementById('file-preview-size');
-            const iconBox = document.getElementById('preview-icon-box');
 
             nameDisp.textContent = selectedFile.name;
-            sizeDisp.textContent = (selectedFile.size / (1024 * 1024)).toFixed(2) + ' MB';
+            sizeDisp.textContent = (selectedFile.size / 1024).toFixed(1) + ' KB';
             
-            // Alterar ícone conforme tipo
-            if(selectedFile.type.startsWith('image/')) iconBox.innerHTML = '<i data-lucide="image"></i>';
-            else if(selectedFile.type.startsWith('video/')) iconBox.innerHTML = '<i data-lucide="video"></i>';
-            else if(selectedFile.type.startsWith('audio/')) iconBox.innerHTML = '<i data-lucide="music"></i>';
-            else iconBox.innerHTML = '<i data-lucide="file-text"></i>';
-
-            isViewOnce = false; // Reset toggle
-            document.getElementById('view-once-toggle').classList.remove('text-wa-teal');
-
             preview.classList.remove('hidden');
             iconMic.classList.add('hidden');
             iconSend.classList.remove('hidden');
-            lucide.createIcons();
         };
 
         window.cancelFileUpload = () => {
             selectedFile = null;
-            isViewOnce = false;
-            document.getElementById('universal-file-input').value = '';
+            document.getElementById('file-input').value = '';
             document.getElementById('file-preview').classList.add('hidden');
             const hasText = messageInput.value.trim().length > 0;
             iconMic.classList.toggle('hidden', hasText);
@@ -1656,17 +883,18 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
             };
         };
 
-        // LÓGICA DE CANCELAMENTO / EXCLUSÃO (BOTÃO LIXEIRA)
-        window.cancelRecording = () => {
-            // Se estiver a gravar, cancelamos o processo de gravação
-            if (isRecording) {
-                window.stopRecordingProcess(true);
-            } else if (isReviewMode) {
-                // Se estiver apenas a revisar, resetamos a UI e limpamos o buffer
-                resetInputUI();
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+                stopTimer();
+                document.getElementById('recording-status').classList.add('hidden');
+                messageInput.classList.remove('hidden');
+                iconMic.classList.remove('text-red-500', 'recording-pulse');
+                iconMic.setAttribute('data-lucide', 'mic');
+                lucide.createIcons();
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
             }
-            showBlippNotification("Blipp Áudio", "Gravação eliminada com sucesso.", "info");
-        };
+        }
 
         function startTimer() {
             secondsElapsed = 0;
@@ -1684,26 +912,15 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
             clearInterval(recordTimer);
         }
 
-        // AUTH & SYNC (OTIMIZADO PARA PERSISTÊNCIA)
+        // AUTH & SYNC
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
                 document.getElementById('auth-container').classList.add('hidden');
-                
-                // Primeiro sincronizamos/recuperamos dados do Firestore
-                const userData = await syncUser(user);
-                
-                // Atualizar UI Global com os dados persistentes (Firestore tem prioridade sobre Auth)
-                const finalName = userData.displayName || user.displayName || "Utilizador";
-                const finalPhoto = userData.photoURL || user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(finalName)}&background=00a884&color=fff`;
-                
-                document.getElementById('my-avatar').src = finalPhoto;
-                document.getElementById('qr-my-avatar').src = finalPhoto;
-                document.getElementById('qr-my-name').textContent = finalName;
-                
+                await syncUser(user);
                 switchTab('chats');
                 startGlobalNotificationListener();
-                startIncomingCallListener();
+                startIncomingCallListener(); // Monitorizar chamadas em tempo real
             } else {
                 document.getElementById('auth-container').classList.remove('hidden');
             }
@@ -1727,8 +944,6 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
                         if (change.doc.data().status === "ended") endCallUI();
                     }
                 });
-            }, (error) => {
-                console.warn("Call Listener Permission Warning:", error);
             });
         }
 
@@ -1880,30 +1095,18 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
 
         async function syncUser(user) {
             const ref = doc(db, "users", user.uid);
-            const snap = await getDoc(ref);
-            
-            let data = {
-                uid: user.uid,
-                email: user.email,
-                lastSeen: serverTimestamp()
-            };
-
-            // Se o utilizador já existe, não sobrepomos com dados nulos do Auth
-            if (!snap.exists()) {
-                data.displayName = user.displayName || user.email.split('@')[0];
-                data.photoURL = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.displayName)}&background=00a884&color=fff`;
-                await setDoc(ref, data);
-                return data;
-            } else {
-                await updateDoc(ref, { lastSeen: serverTimestamp() });
-                return snap.data();
-            }
+            await setDoc(ref, { 
+                uid: user.uid, 
+                email: user.email, 
+                displayName: user.displayName || user.email.split('@')[0],
+                photoURL: user.photoURL || `https://ui-avatars.com/api/?name=${user.email}`
+            }, { merge: true });
+            document.getElementById('my-avatar').src = user.photoURL || `https://ui-avatars.com/api/?name=${user.email}`;
         }
 
         // TABS NAVIGATION
         window.switchTab = (tab) => {
             currentTab = tab;
-            currentFilter = 'all'; // Reset filter on tab change
             const titles = { chats: 'Conversas', contacts: 'Contactos', status: 'Status', channels: 'Canais', communities: 'Comunidades', calls: 'Chamadas', settings: 'Configurações' };
             const titleEl = document.getElementById('sidebar-title');
             if (titleEl) titleEl.textContent = titles[tab] || 'Blipp';
@@ -1926,11 +1129,6 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
             if(tab === 'settings') header.classList.add('hidden');
             else header.classList.remove('hidden');
 
-            renderSidebarContent();
-        };
-
-        window.setChatFilter = (filter) => {
-            currentFilter = filter;
             renderSidebarContent();
         };
 
@@ -1971,22 +1169,6 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
                                     <button onclick="toggleDarkMode()" class="w-10 h-10 bg-wa-bg dark:bg-wa-darkBg rounded-full flex items-center justify-center dark:text-white">
                                         <i data-lucide="moon"></i>
                                     </button>
-                                </div>
-                            </div>
-
-                            <!-- INSTALAR COMO APP -->
-                            <div class="bg-white dark:bg-wa-darkHeader rounded-xl shadow-sm overflow-hidden">
-                                <div class="p-4 flex justify-between items-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" onclick="installBlippApp()">
-                                    <div class="flex items-center gap-3">
-                                        <div class="p-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-lg">
-                                            <i data-lucide="download-cloud"></i>
-                                        </div>
-                                        <div>
-                                            <p class="font-bold dark:text-white">Instalar Aplicação</p>
-                                            <p class="text-xs text-gray-500">Usar o Blipp como App nativa</p>
-                                        </div>
-                                    </div>
-                                    <i data-lucide="chevron-right" class="text-gray-400"></i>
                                 </div>
                             </div>
 
@@ -2069,39 +1251,12 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
                     container.appendChild(item);
                 });
             } else if (currentTab === 'chats') {
-                const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-                const userData = userDoc.data() || {};
-                const customLists = userData.customLists || [];
-                const favorites = userData.favorites || [];
-
-                // Renderizar Barra de Filtros
-                const filterBar = document.getElementById('filter-bar');
-                if(filterBar) {
-                    const filters = [
-                        { id: 'all', label: 'Todas' },
-                        { id: 'unread', label: 'Não lidas' },
-                        { id: 'favorites', label: 'Favoritos' },
-                        { id: 'groups', label: 'Grupos' },
-                        ...customLists.map(l => ({ id: 'custom_' + l.name, label: l.name }))
-                    ];
-                    filterBar.innerHTML = filters.map(f => `
-                        <button onclick="setChatFilter('${f.id}')" class="px-3 py-1 rounded-full text-[12px] font-semibold whitespace-nowrap transition-all active:scale-95 ${currentFilter === f.id ? 'bg-wa-teal/15 text-wa-teal' : 'bg-gray-100 dark:bg-gray-800 text-gray-500'}">
-                            ${f.label}
-                        </button>
-                    `).join('') + `
-                        <button onclick="createNewListPrompt()" class="bg-gray-100 dark:bg-gray-800 text-gray-500 p-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 shrink-0 transition-all" title="Nova Lista">
-                            <i data-lucide="plus" class="w-4 h-4"></i>
-                        </button>
-                    `;
-                    lucide.createIcons();
-                }
-
                 const q = query(collection(db, "chats"), where("participants", "array-contains", currentUser.uid));
                 
                 sidebarUnsub = onSnapshot(q, async (s) => {
                     if (s.empty) { container.innerHTML = '<div class="p-10 text-center text-gray-400">Inicie uma conversa ou grupo.</div>'; return; }
                     
-                    // Preparar lista de promessas
+                    // Preparar lista de promessas para evitar desfasamento visual
                     const chatPromises = s.docs.map(async (d) => {
                         const chatData = d.data();
                         const chatID = d.id;
@@ -2125,35 +1280,11 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
                     const blockedList = userData.blocked || [];
                     const mutedList = userData.muted || {};
 
-                    let chats = await Promise.all(chatPromises);
-
-                    // --- APLICAR FILTROS EM TEMPO REAL ---
-                    if (currentFilter === 'unread') {
-                        chats = chats.filter(c => c.data.unreadCount && c.data.unreadCount[currentUser.uid] > 0);
-                    } else if (currentFilter === 'favorites') {
-                        chats = chats.filter(c => favorites.includes(c.id));
-                    } else if (currentFilter === 'groups') {
-                        chats = chats.filter(c => c.data.isGroup);
-                    } else if (currentFilter.startsWith('custom_')) {
-                        const listName = currentFilter.replace('custom_', '');
-                        const targetList = customLists.find(l => l.name === listName);
-                        if (targetList) {
-                            chats = chats.filter(c => {
-                                const otherId = c.data.participants.find(id => id !== currentUser.uid);
-                                return targetList.members.includes(otherId) || targetList.members.includes(c.id);
-                            });
-                        }
-                    }
-
-                    // Ordenação: Recentes no topo
+                    const chats = await Promise.all(chatPromises);
+                    // Ordenação: Apenas por última atualização (as mais recentes no topo)
                     chats.sort((a, b) => (b.data.lastUpdate?.seconds || 0) - (a.data.lastUpdate?.seconds || 0));
 
                     container.innerHTML = '';
-                    if(chats.length === 0) {
-                        container.innerHTML = `<div class="p-10 text-center text-gray-400 text-sm">Nenhuma conversa encontrada neste filtro.</div>`;
-                        return;
-                    }
-
                     chats.forEach(c => {
                         const otherId = c.data.participants?.find(id => id !== currentUser.uid);
                         const isBlocked = blockedList.includes(otherId);
@@ -2180,9 +1311,6 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
                         container.appendChild(item);
                     });
                     lucide.createIcons();
-                }, (error) => {
-                    console.error("Sidebar Chats Permission Error:", error);
-                    container.innerHTML = '<div class="p-10 text-center text-red-500 text-sm">Erro de permissão ao carregar conversas.</div>';
                 });
             } else if (currentTab === 'status') {
                 container.innerHTML = `
@@ -2345,8 +1473,7 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
         window.searchGifs = async (query) => {
             if(!query) return;
             const apiKey = '5G3yJ8FzP49UvS3v3R2g8W8Fp0q9K9Z4'; // Key pública demo
-            // Correção de entidades & para evitar erro no editor
-            const url = `https://api.giphy.com/v1/gifs/${query === 'trending' ? 'trending' : 'search?q='+query}&api_key=${apiKey}&limit=10&rating=g`.replace(/&/g, '&amp;');
+            const url = `https://api.giphy.com/v1/gifs/${query === 'trending' ? 'trending' : 'search?q='+query}&api_key=${apiKey}&limit=10&rating=g`;
             try {
                 const res = await fetch(url);
                 const { data } = await res.json();
@@ -2486,51 +1613,23 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
             const name = document.getElementById('group-name-input').value.trim();
             if(!name || selectedForGroup.length === 0) return alert("Defina o nome e selecione pelo menos 1 membro.");
 
-            // Se o modal estiver no modo "Lista", guardamos como metadados do utilizador
-            if(window.isCreatingList) {
-                await updateDoc(doc(db, "users", currentUser.uid), {
-                    customLists: arrayUnion({ name: name, members: selectedForGroup })
-                });
-                showBlippNotification("Blipp Listas", `Lista "${name}" criada!`, 'success');
-            } else {
-                const participants = [currentUser.uid, ...selectedForGroup];
-                await addDoc(collection(db, "chats"), {
-                    isGroup: true,
-                    groupName: name,
-                    groupAvatar: null,
-                    participants: participants,
-                    createdBy: currentUser.uid,
-                    lastMessage: "Grupo criado",
-                    lastUpdate: serverTimestamp()
-                });
-                showBlippNotification("Blipp Grupos", `Grupo "${name}" criado!`, 'success');
-            }
+            const participants = [currentUser.uid, ...selectedForGroup];
+            const groupRef = await addDoc(collection(db, "chats"), {
+                isGroup: true,
+                groupName: name,
+                groupAvatar: null,
+                participants: participants,
+                createdBy: currentUser.uid,
+                lastMessage: "Grupo criado",
+                lastUpdate: serverTimestamp()
+            });
 
+            showBlippNotification("Blipp Grupos", `Grupo "${name}" criado!`, 'success');
             closeGroupModal();
             renderSidebarContent();
         };
 
-        window.createNewListPrompt = () => {
-            window.isCreatingList = true;
-            openNewGroupModal();
-            const header = document.querySelector('#group-modal h3');
-            if(header) header.innerText = "Criar Nova Lista";
-            const btn = document.querySelector('#group-modal footer button');
-            if(btn) btn.innerText = "CRIAR LISTA";
-        };
-
-        // Resetar o estado do modal ao fechar
-        const originalCloseGroup = window.closeGroupModal;
-        window.closeGroupModal = () => {
-            window.isCreatingList = false;
-            const header = document.querySelector('#group-modal h3');
-            if(header) header.innerText = "Criar Novo Grupo";
-            const btn = document.querySelector('#group-modal footer button');
-            if(btn) btn.innerText = "CRIAR GRUPO";
-            originalCloseGroup();
-        };
-
-        window.openGroupChat = async (groupId, data) => {
+        window.openGroupChat = (groupId, data) => {
             // Mobile navigation toggle
             document.getElementById('main-wrapper').classList.remove('sidebar-active');
             document.getElementById('main-wrapper').classList.add('chat-active');
@@ -2539,9 +1638,6 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
             activeChatId = groupId;
             activeChatUser = { uid: groupId, displayName: data.groupName, photoURL: data.groupAvatar || `https://ui-avatars.com/api/?name=${data.groupName}&background=008069&color=fff` };
             
-            // Sincronizar Wallpaper do utilizador logado
-            await applyUserWallpaper();
-
             document.getElementById('chat-placeholder').classList.add('hidden');
             document.getElementById('chat-content').classList.remove('hidden');
             document.getElementById('chat-username').textContent = data.groupName;
@@ -2563,9 +1659,6 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
             try {
                 activeChatUser = user;
                 activeChatId = chatId;
-
-                // Sincronizar Wallpaper do utilizador logado para esta conversa
-                await applyUserWallpaper();
 
                 const chatRef = doc(db, "chats", chatId);
                 // Usamos setDoc com merge apenas para garantir que a entrada existe no DB
@@ -2597,53 +1690,6 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
                 if (!area) return;
                 area.innerHTML = '';
                 
-                const systemText = `As mensagens e ligações são protegidas com a criptografia de ponta a ponta. Somente as pessoas que fazem parte da conversa podem ler, ouvir e compartilhar esse conteúdo. <span class="font-bold underline cursor-pointer">Saiba mais</span>`;
-                
-                let initialHTML = '';
-
-                if (s.empty) {
-                    // SIMULAÇÃO DE HISTÓRICO EXTENSO (CONTEXTO 02/04/2026)
-                    // Criamos várias entradas para simular que o canal de segurança foi aberto múltiplas vezes
-                    const fakeHistory = [
-                        "28 de março de 2026",
-                        "29 de março de 2026",
-                        "30 de março de 2026",
-                        "31 de março de 2026",
-                        "01 de abril de 2026",
-                        "hoje"
-                    ];
-
-                    fakeHistory.forEach((date, index) => {
-                        // Adicionamos margem superior maior para separar os blocos de datas
-                        initialHTML += `
-                            <div class="flex justify-center ${index === 0 ? 'mt-2' : 'mt-8'} mb-2">
-                                <span class="date-divider">${date}</span>
-                            </div>
-                            <div class="system-notice flex flex-col items-center animate-fade-in">
-                                <p class="flex items-start justify-center gap-1.5">
-                                    <i data-lucide="lock" class="w-3 h-3 mt-1 shrink-0"></i>
-                                    <span>${systemText}</span>
-                                </p>
-                            </div>
-                        `;
-                    });
-                } else {
-                    // COMPORTAMENTO PADRÃO SE HOUVER MENSAGENS
-                    initialHTML = `
-                        <div class="system-notice flex flex-col items-center">
-                            <p class="flex items-start justify-center gap-1.5">
-                                <i data-lucide="lock" class="w-3 h-3 mt-1 shrink-0"></i>
-                                <span>${systemText}</span>
-                            </p>
-                        </div>
-                        <div class="flex justify-center">
-                            <span class="date-divider">hoje</span>
-                        </div>
-                    `;
-                }
-
-                area.insertAdjacentHTML('beforeend', initialHTML);
-
                 // Aplicar classe de seleção ao container
                 if(isSelectionMode) area.classList.add('selection-active');
                 else area.classList.remove('selection-active');
@@ -2682,30 +1728,10 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
                         }
 
                         if(d.mediaUrl) {
-                            const isOpened = d.isViewOnce && d.viewers?.includes(currentUser.uid);
-                            
-                            if (d.isViewOnce) {
-                                content += `
-                                    <div onclick="handleViewOnceClick('${m.id}', '${d.mediaUrl}', '${d.mediaType}')" class="view-once-bubble ${isOpened ? 'view-once-opened' : ''}">
-                                        <div class="view-once-icon">${isOpened ? '✓' : '1'}</div>
-                                        <span class="font-bold">${isOpened ? 'Mensagem aberta' : (d.mediaType === 'image' ? 'Foto' : (d.mediaType === 'video' ? 'Vídeo' : 'Ficheiro'))}</span>
-                                    </div>`;
-                            } else {
-                                if(d.mediaType === 'sticker') content += `<img src="${d.mediaUrl}" class="w-32 h-32 object-contain">`;
-                                else if(d.mediaType === 'gif') content += `<img src="${d.mediaUrl}" class="w-full max-h-60 rounded-lg object-cover">`;
-                                else if(d.mediaType === 'image') content += `
-                                    <div class="relative group">
-                                        <img src="${d.mediaUrl}" class="w-full max-h-80 rounded-lg object-cover cursor-pointer">
-                                        <button onclick="downloadMedia('${d.mediaUrl}', '${d.fileName || 'image.jpg'}')" class="absolute top-2 right-2 p-2 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"><i data-lucide="download" class="w-4 h-4"></i></button>
-                                    </div>`;
-                                else if(d.mediaType === 'video') content += `
-                                    <div class="relative group">
-                                        <video src="${d.mediaUrl}" class="w-full max-h-80 rounded-lg object-cover" controls></video>
-                                        <button onclick="downloadMedia('${d.mediaUrl}', '${d.fileName || 'video.mp4'}')" class="absolute top-2 right-12 p-2 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"><i data-lucide="download" class="w-4 h-4"></i></button>
-                                    </div>`;
-                                else if(d.mediaType === 'audio') content += `<div class="flex items-center gap-3 min-w-[220px] p-1"><button onclick="playAudio(this, 'audio-${m.id}')" class="w-10 h-10 flex items-center justify-center bg-wa-teal text-white rounded-full hover:bg-wa-green transition-colors"><i data-lucide="play" class="w-5 h-5 fill-current"></i></button><div class="flex-1 flex flex-col gap-1"><div class="audio-wave"><span></span><span style="animation-delay:0.1s"></span><span style="animation-delay:0.2s"></span><span style="animation-delay:0.4s"></span><span style="animation-delay:0.3s"></span></div><span class="text-[10px] opacity-60 uppercase font-bold tracking-tighter">Áudio</span></div><audio id="audio-${m.id}" src="${d.mediaUrl}" class="hidden"></audio></div>`;
-                                else content += `<div class="flex flex-col gap-1"><a href="${d.mediaUrl}" target="_blank" class="flex items-center gap-3 p-2 bg-black/5 dark:bg-white/5 rounded-lg border dark:border-gray-700"><i data-lucide="file-text" class="text-wa-teal"></i><div class="min-w-0 flex-1"><p class="text-xs font-bold truncate">${d.fileName || 'Documento'}</p><p class="text-[10px] opacity-50">Documento</p></div><i data-lucide="download" class="w-4 h-4 opacity-40"></i></a></div>`;
-                            }
+                            if(d.mediaType === 'sticker') content += `<img src="${d.mediaUrl}" class="w-32 h-32 object-contain">`;
+                            else if(d.mediaType === 'gif') content += `<img src="${d.mediaUrl}" class="w-full max-h-60 rounded-lg object-cover">`;
+                            else if(d.mediaType === 'audio') content += `<div class="flex items-center gap-3 min-w-[220px] p-1"><button onclick="playAudio(this, 'audio-${m.id}')" class="w-10 h-10 flex items-center justify-center bg-wa-teal text-white rounded-full hover:bg-wa-green transition-colors"><i data-lucide="play" class="w-5 h-5 fill-current"></i></button><div class="flex-1 flex flex-col gap-1"><div class="audio-wave"><span></span><span style="animation-delay:0.1s"></span><span style="animation-delay:0.2s"></span><span style="animation-delay:0.4s"></span><span style="animation-delay:0.3s"></span></div><span class="text-[10px] opacity-60 uppercase font-bold tracking-tighter">Voz</span></div><audio id="audio-${m.id}" src="${d.mediaUrl}" class="hidden"></audio></div>`;
+                            else if(d.mediaType === 'file') content += `<a href="${d.mediaUrl}" target="_blank" class="flex items-center gap-3 p-2 bg-black/5 dark:bg-white/5 rounded-lg border dark:border-gray-700"><i data-lucide="file-text" class="text-wa-teal"></i><div class="min-w-0 flex-1"><p class="text-xs font-bold truncate">${d.fileName || 'Ficheiro'}</p></div><i data-lucide="download" class="w-4 h-4 opacity-40"></i></a>`;
                         }
                         content += `<span>${d.text}</span>`;
                         
@@ -2747,9 +1773,6 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
                 lucide.createIcons();
                 const container = document.getElementById('message-container');
                 container.scrollTop = container.scrollHeight;
-            }, (error) => {
-                console.error("Messages Permission Error:", error);
-                showBlippNotification("Erro", "Sem permissão para ler mensagens.", "error");
             });
         }
 
@@ -2879,8 +1902,6 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
                         }
                     }
                 });
-            }, (error) => {
-                console.warn("Global Notif Permission Warning:", error);
             });
         }
 
@@ -2947,17 +1968,9 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
                 try {
                     const url = await window.uploadFileToR2(file, type + 's');
                     if(type === 'avatar') {
-                        // 1. Atualizar UI imediata
                         document.getElementById('p-avatar').src = url;
                         document.getElementById('my-avatar').src = url;
-                        document.getElementById('qr-my-avatar').src = url;
-                        
-                        // 2. Persistir no Firestore
                         await updateDoc(doc(db, "users", currentUser.uid), { photoURL: url });
-                        
-                        // 3. Persistir no Firebase Auth Profile
-                        await updateProfile(auth.currentUser, { photoURL: url });
-                        
                     } else if(type === 'cover') {
                         document.getElementById('p-cover').style.backgroundImage = `url(${url})`;
                         await updateDoc(doc(db, "users", currentUser.uid), { coverURL: url });
@@ -2970,61 +1983,31 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
             input.click();
         };
 
-        // Função para aplicar o wallpaper salvo na conta do utilizador
-        async function applyUserWallpaper() {
-            const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-            const wallpaper = userDoc.data()?.wallpaper || 'default';
+        window.setWallpaper = async (value) => {
             const chatBg = document.getElementById('message-container');
-            
-            if(!chatBg) return;
-
-            if(wallpaper === 'default') {
+            if(value === 'default') {
                 chatBg.style.backgroundImage = "url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')";
                 chatBg.style.backgroundColor = "";
-            } else if(wallpaper.startsWith('#')) {
+            } else if(value.startsWith('#')) {
                 chatBg.style.backgroundImage = "none";
-                chatBg.style.backgroundColor = wallpaper;
+                chatBg.style.backgroundColor = value;
             } else {
-                chatBg.style.backgroundImage = `url(${wallpaper})`;
+                chatBg.style.backgroundImage = `url(${value})`;
                 chatBg.style.backgroundColor = "transparent";
-                chatBg.style.backgroundSize = "cover";
-                chatBg.style.backgroundPosition = "center";
             }
-        }
-
-        window.setWallpaper = async (value) => {
             await updateDoc(doc(db, "users", currentUser.uid), { wallpaper: value });
-            await applyUserWallpaper();
             showBlippNotification("Blipp Design", "Papel de parede atualizado!", "success");
         };
 
         window.saveFullProfile = async () => {
-            const name = document.getElementById('p-name').value.trim();
-            const status = document.getElementById('p-status').value.trim();
-            
-            if (!name) return showBlippNotification("Erro", "O nome não pode estar vazio.", "error");
-
-            showBlippNotification("Perfil", "A guardar alterações...", "info");
-            
-            try {
-                // 1. Atualizar Firestore
-                await updateDoc(doc(db, "users", currentUser.uid), { 
-                    displayName: name,
-                    status: status
-                });
-
-                // 2. Atualizar Firebase Auth (Evita que o nome volte a ser null no reload)
-                await updateProfile(auth.currentUser, { displayName: name });
-
-                // 3. Atualizar UI Global
-                document.getElementById('qr-my-name').textContent = name;
-                
-                showBlippNotification("Perfil", "Dados atualizados com sucesso!", "success");
-                closeProfileModal();
-                renderSidebarContent(); // Atualiza o mini-perfil nas definições
-            } catch (err) {
-                showBlippNotification("Erro", "Falha ao guardar perfil.", "error");
-            }
+            const name = document.getElementById('p-name').value;
+            const status = document.getElementById('p-status').value;
+            await updateDoc(doc(db, "users", currentUser.uid), { 
+                displayName: name,
+                status: status
+            });
+            showBlippNotification("Perfil", "Dados atualizados!", "success");
+            closeProfileModal();
         };
 
         // LÓGICA DE PESQUISA NO CHAT
@@ -3468,38 +2451,6 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
             addFriendBtn.onclick = () => openNewContactModal();
         }
 
-        // LÓGICA DE DOWNLOAD
-        window.downloadMedia = (url, name) => {
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = name;
-            a.target = "_blank";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            showBlippNotification("Download", "A iniciar transferência...", "success");
-        };
-
-        // LÓGICA DE VISUALIZAÇÃO ÚNICA
-        window.handleViewOnceClick = async (msgId, url, type) => {
-            const msgRef = doc(db, 'chats', activeChatId, 'messages', msgId);
-            const msgSnap = await getDoc(msgRef);
-            const data = msgSnap.data();
-
-            if (data.viewers?.includes(currentUser.uid)) {
-                return showBlippNotification("Atenção", "Esta mensagem de visualização única já foi aberta.", "error");
-            }
-
-            // Abrir em Modal de Ecrã Inteiro (Simulação simplificada para o snippet)
-            if (confirm(`Deseja abrir esta média de visualização única? Ela desaparecerá após fechar.`)) {
-                window.open(url, '_blank');
-                // Marcar como aberta
-                await updateDoc(msgRef, {
-                    viewers: arrayUnion(currentUser.uid)
-                });
-            }
-        };
-
         // SUBMIT FORM (TEXTO, FICHEIRO OU ÁUDIO)
         document.getElementById('message-form').onsubmit = async (e) => {
             e.preventDefault();
@@ -3507,30 +2458,21 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
 
             if (selectedFile) {
                 const fileToUpload = selectedFile;
-                const viewOnceState = isViewOnce;
-                const mime = fileToUpload.type;
-                let type = 'file';
-                if(mime.startsWith('image/')) type = 'image';
-                else if(mime.startsWith('video/')) type = 'video';
-                else if(mime.startsWith('audio/')) type = 'audio';
-
                 cancelFileUpload(); // Limpar UI
-                showBlippNotification("Cloud R2", "A processar ficheiro...", "info");
+                showBlippNotification("Blipp", "A enviar ficheiro...", "info");
                 try {
-                    const url = await window.uploadFileToR2(fileToUpload, type + 's');
+                    const url = await window.uploadFileToR2(fileToUpload, 'files');
                     await addDoc(collection(db, 'chats', activeChatId, 'messages'), {
                         senderId: currentUser.uid,
-                        text: text || "",
+                        text: text || `[Ficheiro: ${fileToUpload.name}]`,
                         mediaUrl: url,
-                        mediaType: type,
+                        mediaType: 'file',
                         fileName: fileToUpload.name,
-                        isViewOnce: viewOnceState,
-                        viewers: [],
                         timestamp: serverTimestamp()
                     });
                     messageInput.value = '';
                 } catch (err) {
-                    showBlippNotification("Erro R2", "Falha ao enviar ficheiro.", "error");
+                    showBlippNotification("Erro", "Falha ao enviar ficheiro.", "error");
                 }
                 return;
             }
@@ -3548,66 +2490,19 @@ const isIos=()=>/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()
                 }
                 await addDoc(collection(db, 'chats', activeChatId, 'messages'), msgData);
                 messageInput.value = '';
-                // Forçar atualização do estado dos botões
-                messageInput.dispatchEvent(new Event('input'));
-            }
-        };
-
-        // Lógica de Troca entre Login e Registo
-        window.toggleAuthMode = (mode) => {
-            const loginForm = document.getElementById('login-form');
-            const regForm = document.getElementById('register-form');
-            if (mode === 'register') {
-                loginForm.classList.add('hidden');
-                regForm.classList.remove('hidden');
+                iconMic.classList.remove('hidden');
+                iconSend.classList.add('hidden');
             } else {
-                loginForm.classList.remove('hidden');
-                regForm.classList.add('hidden');
+                // Se clicar sem texto nem ficheiro, inicia/para gravação
+                window.toggleRecording();
             }
         };
 
-        // Login
         document.getElementById('login-form').onsubmit = async (e) => {
             e.preventDefault();
             const em = document.getElementById('login-email').value;
             const pw = document.getElementById('login-password').value;
-            showBlippNotification("Autenticação", "A entrar no sistema...", "info");
-            try { 
-                await signInWithEmailAndPassword(auth, em, pw); 
-            } catch(err) { 
-                showBlippNotification("Erro de Login", "Credenciais inválidas ou erro de rede.", "error"); 
-            }
-        };
-
-        // Registo
-        document.getElementById('register-form').onsubmit = async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('reg-name').value;
-            const email = document.getElementById('reg-email').value;
-            const password = document.getElementById('reg-password').value;
-
-            if(password.length < 6) return showBlippNotification("Segurança", "A senha deve ter pelo menos 6 caracteres.", "error");
-
-            showBlippNotification("Blipp Registo", "A criar a sua conta...", "info");
-            try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-                
-                // Atualizar o nome no perfil de autenticação do Firebase
-                await updateProfile(user, {
-                    displayName: name,
-                    photoURL: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00a884&color=fff&size=256`
-                });
-
-                // Sincronizar com o Firestore (isto já aciona o listener onAuthStateChanged)
-                await syncUser(user);
-                showBlippNotification("Bem-vindo!", "Conta criada com sucesso.", "success");
-            } catch (err) {
-                console.error(err);
-                let msg = "Falha ao criar conta.";
-                if(err.code === 'auth/email-already-in-use') msg = "Este email já está registado.";
-                showBlippNotification("Erro de Registo", msg, "error");
-            }
+            try { await signInWithEmailAndPassword(auth, em, pw); } catch(e) { alert("Erro de login."); }
         };
 
         // GESTÃO DE ÁUDIOS PESSOAIS (SETTINGS)
